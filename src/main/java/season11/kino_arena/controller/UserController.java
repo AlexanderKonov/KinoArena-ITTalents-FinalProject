@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.model.dao.UserDAO;
 import season11.kino_arena.model.dto.LoginUserDTO;
 import season11.kino_arena.model.dto.RegisterUserDTO;
@@ -20,23 +21,33 @@ public class UserController {
 
     @Autowired
     private UserDAO userDao;
-
     @PostMapping("/register")
-    public User register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException {
+    public UserWithoutPasswordDTO register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException, BadRequestException {
         //TODO validate data in userDto
         //create User object
-//        if (!userDto.hasValidPassword()){
-//            //throw new InvalidPasswordException();
-//        }
+        if (userIsRegistered(userDto)){
+            throw new BadRequestException("This username is already taken.");
+        }
+        if (!hasValidPassword(userDto)){
+            throw new BadRequestException("Invalid password.");
+        }
         User user = new User(userDto);
         //add to database
         userDao.addUser(user);
         //return UserWithoutPasswordDTO
         //session.setAttribute(SESSION_KEY_LOGGED_USER, user);
         //UserWithoutPasswordDTO responseDto = new UserWithoutPasswordDTO(user);
-        return user;
+        UserWithoutPasswordDTO userWithoutPassword = new UserWithoutPasswordDTO(user);
+        return userWithoutPassword;
+    }
+    public boolean userIsRegistered(RegisterUserDTO u) throws SQLException {
+        return userDao.getByUsername(u.getUsername())!=null;
     }
 
+    public boolean hasValidPassword(RegisterUserDTO u) {
+        return !(!(u.getPassword().equals(u.getConfirmPassword())) || u.getPassword().contains(" ") || u.getPassword().length() < 8);
+        //return !u.getPassword().equals(u.getConfirmPassword()) && !u.getPassword().contains(" ") && u.getPassword().length() >= 8;
+    }
 
     @PostMapping("/login")
     public UserWithoutPasswordDTO login (@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException {

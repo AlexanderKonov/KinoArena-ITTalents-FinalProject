@@ -28,6 +28,7 @@ public class UserWithoutPasswordDTO {
     private LocalDateTime createTime;
 
     public UserWithoutPasswordDTO(User u) {
+        setId(u.getId());
         setFirstName(u.getFirstName());
         setSecondName(u.getSecondName());
         setLastName(u.getLastName());
