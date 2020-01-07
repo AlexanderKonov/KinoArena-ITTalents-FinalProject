@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @NoArgsConstructor
-public class UserWithoutPassword {
+public class UserWithoutPasswordDTO {
 
     private long id;
     private String firstName;
