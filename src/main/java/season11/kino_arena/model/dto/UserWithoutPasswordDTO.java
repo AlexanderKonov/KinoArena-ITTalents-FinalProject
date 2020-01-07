@@ -1,6 +1,5 @@
 package season11.kino_arena.model.dto;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,7 +7,10 @@ import season11.kino_arena.model.pojo.User;
 
 import java.time.LocalDateTime;
 
-@Data
+
+@Setter
+@Getter
+@NoArgsConstructor
 public class UserWithoutPasswordDTO {
 
     private long id;

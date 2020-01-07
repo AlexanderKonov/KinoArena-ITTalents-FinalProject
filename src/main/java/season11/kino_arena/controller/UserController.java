@@ -25,9 +25,9 @@ public class UserController {
     public User register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException {
         //TODO validate data in userDto
         //create User object
-        if (!userDto.hasValidPassword()){
-            //throw new InvalidPasswordException();
-        }
+//        if (!userDto.hasValidPassword()){
+//            //throw new InvalidPasswordException();
+//        }
         User user = new User(userDto);
         //add to database
         userDao.addUser(user);
@@ -37,11 +37,13 @@ public class UserController {
         return user;
     }
 
+
     @PostMapping("/login")
     public UserWithoutPasswordDTO login (@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException {
         User user = userDao.getByUsername(loginUserDTO.getUsername());
         if(user == null){
             //throw new AuthorizationException("Invalid credentials");
+            return null;
         }
         else
         if(passwordValid(user, loginUserDTO)) {
