@@ -26,29 +26,74 @@ public class UserDAO {
             "personal_info, " +
             "create_time) " +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);";
+    private static final String SELECT_USER_BY_USERNAME = "SELECT " +
+            "id, " +
+            "first_name, " +
+            "second_name, " +
+            "last_name, " +
+            "username, " +
+            "email, " +
+            "password, " +
+            "city, " +
+            "post_code, " +
+            "address, " +
+            "education, " +
+            "job, " +
+            "personal_info, " +
+            "create_time " +
+            "FROM users " +
+            "WHERE username = ?;";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     public void addUser(User user) throws SQLException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
-        PreparedStatement ps = connection.prepareStatement(REGISTER_USER_SQL, Statement.RETURN_GENERATED_KEYS);
-        ps.setString(1, user.getFirstName());
-        ps.setString(2, user.getSecondName());
-        ps.setString(3, user.getLastName());
-        ps.setString(4, user.getUsername());
-        ps.setString(5, user.getEmail());
-        ps.setString(6, user.getPassword());
-        ps.setString(7, user.getCity());
-        ps.setInt(8, user.getPostCode());
-        ps.setString(9, user.getAddress());
-        ps.setString(10, user.getEducation());
-        ps.setString(11, user.getJob());
-        ps.setString(12, user.getPersonalInfo());
-        ps.setTimestamp(13,Timestamp.valueOf(LocalDateTime.now()));
-        ps.executeUpdate();
-        ResultSet keys = ps.getGeneratedKeys();
-        keys.next();
-        user.setId(keys.getLong(1));
+        try(PreparedStatement ps = connection.prepareStatement(REGISTER_USER_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getSecondName());
+            ps.setString(3, user.getLastName());
+            ps.setString(4, user.getUsername());
+            ps.setString(5, user.getEmail());
+            ps.setString(6, user.getPassword());
+            ps.setString(7, user.getCity());
+            ps.setInt(8, user.getPostCode());
+            ps.setString(9, user.getAddress());
+            ps.setString(10, user.getEducation());
+            ps.setString(11, user.getJob());
+            ps.setString(12, user.getPersonalInfo());
+            ps.setTimestamp(13, Timestamp.valueOf(LocalDateTime.now()));
+            ps.executeUpdate();
+            ResultSet keys = ps.getGeneratedKeys();
+            keys.next();
+            user.setId(keys.getLong(1));
+        }
+    }
+
+    public User getByUsername(String username) throws SQLException {
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try(PreparedStatement ps = connection.prepareStatement(SELECT_USER_BY_USERNAME, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                return new User(rs.getLong("id"),
+                        rs.getString("first_name"),
+                        rs.getString("second_name"),
+                        rs.getString("last_name"),
+                        rs.getString("username"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("city"),
+                        rs.getInt("post_code"),
+                        rs.getString("address"),
+                        rs.getString("education"),
+                        rs.getString("job"),
+                        rs.getString("personal_info"),
+                        rs.getTimestamp("create_time").toLocalDateTime());
+            }
+            else{
+                return null;
+            }
+        }
     }
 }
