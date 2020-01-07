@@ -22,4 +22,12 @@ public class RegisterUserDTO {
     private String education;
     private String job;
     private String personalInfo;
+
+    public boolean hasValidPassword() {
+        //TODO password validation
+        if (!password.equals(confirmPassword)){
+            return false;
+        }
+        return true;
+    }
 }
