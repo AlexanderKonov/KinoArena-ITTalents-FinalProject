@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 public abstract class AbstractController {
 
     @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDTO handleBadRequestException(Exception e){
         return new ErrorDTO(
                 e.getMessage(),
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 e.getClass().getName()
         );
@@ -30,5 +30,16 @@ public abstract class AbstractController {
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDTO handleNotFoundException(Exception e){
+        return new ErrorDTO(
+                e.getMessage(),
+                HttpStatus.NOT_FOUND.value(),
+                LocalDateTime.now(),
+                e.getClass().getName()
+        );
     }
 }

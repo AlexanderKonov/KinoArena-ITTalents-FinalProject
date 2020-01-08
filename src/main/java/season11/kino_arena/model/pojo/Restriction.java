@@ -10,5 +10,5 @@ import lombok.Setter;
 public class Restriction {
     private long id;
     private String name;
-    private int maxAge;
+    private int minAge;
 }
