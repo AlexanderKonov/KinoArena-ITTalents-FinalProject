@@ -18,8 +18,7 @@ public abstract class AbstractController {
                 e.getMessage(),
                 HttpStatus.NOT_FOUND.value(),
                 LocalDateTime.now(),
-                e.getClass().getName()
-        );
+                e.getClass().getName());
     }
 
     @ExceptionHandler(SQLException.class)

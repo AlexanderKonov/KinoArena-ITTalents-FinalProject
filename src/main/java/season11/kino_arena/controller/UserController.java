@@ -21,6 +21,7 @@ public class UserController {
 
     @Autowired
     private UserDAO userDao;
+
     @PostMapping("/register")
     public UserWithoutPasswordDTO register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException, BadRequestException {
         //TODO validate data in userDto
@@ -40,6 +41,7 @@ public class UserController {
         UserWithoutPasswordDTO userWithoutPassword = new UserWithoutPasswordDTO(user);
         return userWithoutPassword;
     }
+
     public boolean userIsRegistered(RegisterUserDTO u) throws SQLException {
         return userDao.getByUsername(u.getUsername())!=null;
     }

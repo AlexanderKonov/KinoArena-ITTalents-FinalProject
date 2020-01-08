@@ -1,18 +1,14 @@
 package season11.kino_arena.model.dto;
 
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import season11.kino_arena.model.dao.UserDAO;
-
-import java.sql.SQLException;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class RegisterUserDTO {
+
     private String firstName;
     private String secondName;
     private String lastName;

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
     private long id;
     private String firstName;
     private String secondName;
@@ -27,22 +28,6 @@ public class User {
     private String job;
     private String personalInfo;
     private LocalDateTime createTime;
-
-    public User(User u) {
-        setFirstName(u.getFirstName());
-        setSecondName(u.getSecondName());
-        setLastName(u.getLastName());
-        setUsername(u.getUsername());
-        setEmail(u.getEmail());
-        setPassword(u.getPassword());
-        setCity(u.getCity());
-        setPostCode(u.getPostCode());
-        setAddress(u.getAddress());
-        setEducation(u.getEducation());
-        setJob(u.getJob());
-        setPersonalInfo(u.getPersonalInfo());
-        setCreateTime(u.getCreateTime());
-    }
 
     public User(RegisterUserDTO u){
         setFirstName(u.getFirstName());
