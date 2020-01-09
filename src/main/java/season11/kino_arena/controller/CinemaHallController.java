@@ -32,7 +32,7 @@ public class CinemaHallController {
         return new CinemaHall(cinemaHallWithIndexes,cinemaHallType,cinema);
     }
 
-    @PostMapping("/halls/edit")
+    @PutMapping("/halls")
     public CinemaHall editCinemaHall(@RequestBody CinemaHallDTO updatedCinemaHall) throws SQLException, NotFoundException, BadRequestException {
         cinemaHallDAO.updateCinemaHall(updatedCinemaHall);
         CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(updatedCinemaHall.getCinemaHallTypeId());

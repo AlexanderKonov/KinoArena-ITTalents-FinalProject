@@ -21,7 +21,7 @@ public class CinemaController {
         return cinema;
     }
 
-    @PostMapping("cinemas/edit")
+    @PutMapping("cinemas/")
     public Cinema editCinema(@RequestBody Cinema cinema) throws SQLException, NotFoundException, BadRequestException {
         cinemaDAO.updateCinema(cinema);
         return cinema;
