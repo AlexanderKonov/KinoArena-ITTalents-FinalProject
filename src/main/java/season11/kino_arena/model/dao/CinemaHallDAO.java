@@ -3,6 +3,7 @@ package season11.kino_arena.model.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.CinemaHallDTO;
 
@@ -40,7 +41,7 @@ public class CinemaHallDAO {
         }
     }
 
-    public void updateCinemaHall(CinemaHallDTO cinemaHall) throws SQLException {
+    public void updateCinemaHall(CinemaHallDTO cinemaHall) throws SQLException, BadRequestException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try(PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_HALL_SQL)){
             ps.setLong(1,cinemaHall.getCinemaHallTypeId());
@@ -48,7 +49,9 @@ public class CinemaHallDAO {
             ps.setInt(3,cinemaHall.getNumberOfRows());
             ps.setInt(4,cinemaHall.getNumberOfSeatsPerRow());
             ps.setLong(5,cinemaHall.getId());
-            ps.executeUpdate();
+            if(ps.executeUpdate()==0){
+                throw new BadRequestException("This cinema hall does not exist.");
+            }
         }
     }
 
