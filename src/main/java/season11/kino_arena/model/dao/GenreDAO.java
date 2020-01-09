@@ -10,7 +10,7 @@ import java.sql.*;
 @Component
 public class GenreDAO {
 
-    private static final String SELECT_BY_ID = "SELECT id, `name` FROM genre WHERE id = ?";
+    private static final String SELECT_BY_ID = "SELECT id, `name` FROM genres WHERE id = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

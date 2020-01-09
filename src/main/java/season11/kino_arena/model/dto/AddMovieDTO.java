@@ -23,7 +23,7 @@ public class AddMovieDTO {
     private long genre;
     private long restriction;
     private double rating;
-    private boolean isDubbed;
+    private Boolean isDubbed;
     private long videoFormat;
     private String cast;
     private String director;

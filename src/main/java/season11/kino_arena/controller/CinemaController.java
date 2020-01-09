@@ -21,14 +21,14 @@ public class CinemaController {
         return cinema;
     }
 
-    @PostMapping("cinemas/edit")
+    @PostMapping("/cinemas/edit")
     public Cinema editCinema(@RequestBody Cinema cinema) throws SQLException, NotFoundException {
         cinemaDAO.updateCinema(cinema);
         cinema = cinemaDAO.getCinemaById(cinema.getId());
         return cinema;
     }
 
-    @PostMapping("cinemas/delete/{id}")
+    @PostMapping("/cinemas/delete/{id}")
     public String deleteCinema(@PathVariable(name = "id") long id) throws NotFoundException, SQLException {
         cinemaDAO.deleteCinema(id);
         //TODO change the plain text to something better

@@ -34,7 +34,7 @@ public class Movie {
         setGenre(g);
         setRestriction(r);
         setRating(m.getRating());
-        setDubbed(m.isDubbed());
+        setDubbed(m.getIsDubbed());
         setVideoFormat(vf);
         setCast(m.getCast());
         setDirector(m.getDirector());

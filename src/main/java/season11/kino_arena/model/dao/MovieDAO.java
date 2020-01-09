@@ -3,6 +3,7 @@ package season11.kino_arena.model.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.model.dto.AddMovieDTO;
 
 import java.sql.*;
@@ -54,7 +55,7 @@ public class MovieDAO {
             ps.setLong(5, movie.getGenre());
             ps.setLong(6, movie.getRestriction());
             ps.setDouble(7, movie.getRating());
-            ps.setBoolean(8, movie.isDubbed());
+            ps.setBoolean(8, movie.getIsDubbed());
             ps.setLong(9, movie.getVideoFormat());
             ps.setString(10, movie.getCast());
             ps.setString(11, movie.getDirector());
@@ -75,7 +76,7 @@ public class MovieDAO {
         }
     }
 
-    public void editMovie(AddMovieDTO movie) throws SQLException {
+    public void editMovie(AddMovieDTO movie) throws SQLException, BadRequestException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement ps = connection.prepareStatement(EDIT_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, movie.getName());
@@ -85,12 +86,14 @@ public class MovieDAO {
             ps.setLong(5, movie.getGenre());
             ps.setLong(6, movie.getRestriction());
             ps.setDouble(7, movie.getRating());
-            ps.setBoolean(8, movie.isDubbed());
+            ps.setBoolean(8, movie.getIsDubbed());
             ps.setLong(9, movie.getVideoFormat());
             ps.setString(10, movie.getCast());
             ps.setString(11, movie.getDirector());
             ps.setLong(12, movie.getId());
-            ps.executeUpdate();
+            if(ps.executeUpdate() == 0){
+                throw new BadRequestException("Movies with this id doesn`t exist");
+            }
         }
     }
 }

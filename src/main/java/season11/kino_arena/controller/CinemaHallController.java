@@ -33,8 +33,7 @@ public class CinemaHallController {
         cinemaHallDAO.addCinemaHall(cinemaHallWithIndexes);
         CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(cinemaHallWithIndexes.getCinemaHallTypeId());
         Cinema cinema = cinemaDAO.getCinemaById(cinemaHallWithIndexes.getCinemaId());
-        CinemaHall hall = new CinemaHall(cinemaHallWithIndexes,cinemaHallType,cinema);
-        return hall;
+        return new CinemaHall(cinemaHallWithIndexes,cinemaHallType,cinema);
     }
 
     @PostMapping("/halls/edit")
@@ -42,8 +41,7 @@ public class CinemaHallController {
         cinemaHallDAO.updateCinemaHall(updatedCinemaHall);
         CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(updatedCinemaHall.getCinemaHallTypeId());
         Cinema cinema = cinemaDAO.getCinemaById(updatedCinemaHall.getCinemaId());
-        CinemaHall hall = new CinemaHall(updatedCinemaHall,cinemaHallType,cinema);
-        return hall;
+        return new CinemaHall(updatedCinemaHall,cinemaHallType,cinema);
     }
 
     @PostMapping("/halls/delete/{id}")

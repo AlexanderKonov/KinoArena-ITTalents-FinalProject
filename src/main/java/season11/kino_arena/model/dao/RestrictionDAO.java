@@ -10,7 +10,7 @@ import java.sql.*;
 @Component
 public class RestrictionDAO {
 
-    private static final String SELECT_BY_ID = "SELECT id, `name` FROM genre WHERE id = ?";
+    private static final String SELECT_BY_ID = "SELECT id, `name` FROM restrictions WHERE id = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
