@@ -1,15 +1,17 @@
 package season11.kino_arena.model.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import season11.kino_arena.model.dto.AddMovieDTO;
+import season11.kino_arena.model.dto.MovieDTO;
 
 import java.sql.Date;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Movie {
 
     private long id;
@@ -25,7 +27,7 @@ public class Movie {
     private String cast;
     private String director;
 
-    public Movie(AddMovieDTO m, Genre g, Restriction r, VideoFormat vf) {
+    public Movie(MovieDTO m, Genre g, Restriction r, VideoFormat vf) {
         setId(m.getId());
         setName(m.getName());
         setDescription(m.getDescription());

@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.BadRequestException;
-import season11.kino_arena.model.dto.AddMovieDTO;
+import season11.kino_arena.exceptions.NotFoundException;
+import season11.kino_arena.model.dto.MovieDTO;
+import season11.kino_arena.model.pojo.Movie;
 
 import java.sql.*;
 
@@ -12,40 +14,60 @@ import java.sql.*;
 public class MovieDAO {
 
     private static final String ADD_MOVIE_SQL = "INSERT INTO movies (" +
-            "`name`, " +
-            "description, " +
-            "runtime_in_min, " +
-            "premiere, " +
-            "genre_id, " +
-            "restriction_id, " +
-            "rating, " +
-            "is_dubbed, " +
-            "video_fomat_id, " +
-            "`cast`, " +
-            "directors) " +
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?);";
+                                                "`name`, " +
+                                                "description, " +
+                                                "runtime_in_min, " +
+                                                "premiere, " +
+                                                "genre_id, " +
+                                                "restriction_id, " +
+                                                "rating, " +
+                                                "is_dubbed, " +
+                                                "video_fomat_id, " +
+                                                "`cast`, " +
+                                                "directors) " +
+                                                "VALUES (?,?,?,?,?,?,?,?,?,?,?);";
 
     private static final String DELETE_MOVIE_SQL = "DELETE FROM movies WHERE id = ?;";
 
     private static final String EDIT_MOVIE_SQL = "UPDATE movies\n" +
-            "SET " +
-            "name = ?," +
-            "description = ?," +
-            "runtime_in_min = ?," +
-            "premiere = ?," +
-            "genre_id = ?," +
-            "restriction_id = ?," +
-            "rating = ?," +
-            "is_dubbed = ?," +
-            "video_fomat_id = ?," +
-            "`cast` = ?," +
-            "directors = ?" +
-            "WHERE id = ?";
+                                                "SET " +
+                                                "name = ?," +
+                                                "description = ?," +
+                                                "runtime_in_min = ?," +
+                                                "premiere = ?," +
+                                                "genre_id = ?," +
+                                                "restriction_id = ?," +
+                                                "rating = ?," +
+                                                "is_dubbed = ?," +
+                                                "video_fomat_id = ?," +
+                                                "`cast` = ?," +
+                                                "directors = ?" +
+                                                "WHERE id = ?";
+
+    private static final String SELECT_BY_ID = "SELECT id, " +
+                                                "`name`, " +
+                                                "description, " +
+                                                "runtime_in_min, " +
+                                                "premiere, " +
+                                                "genre_id, " +
+                                                "restriction_id, " +
+                                                "rating, " +
+                                                "is_dubbed, " +
+                                                "video_fomat_id, " +
+                                                "`cast`, " +
+                                                "directors " +
+                                                "FROM movies WHERE id = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private GenreDAO genreDAO;
+    @Autowired
+    private RestrictionDAO restrictionDAO;
+    @Autowired
+    private VideoFormatDAO videoFormatDAO;
 
-    public void addMovie(AddMovieDTO movie) throws SQLException {
+    public void addMovie(MovieDTO movie) throws SQLException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement ps = connection.prepareStatement(ADD_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, movie.getName());
@@ -66,17 +88,17 @@ public class MovieDAO {
         }
     }
 
-    public void deleteMovie(long id) throws SQLException {
+    public void deleteMovie(long id) throws SQLException, NotFoundException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement ps = connection.prepareStatement(DELETE_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             if(ps.executeUpdate() == 0){
-//                throw new NotFoundException("Movie was not found.")
+                throw new NotFoundException("Movie was not found.");
             }
         }
     }
 
-    public void editMovie(AddMovieDTO movie) throws SQLException, BadRequestException {
+    public void editMovie(MovieDTO movie) throws SQLException, BadRequestException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement ps = connection.prepareStatement(EDIT_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, movie.getName());
@@ -93,6 +115,35 @@ public class MovieDAO {
             ps.setLong(12, movie.getId());
             if(ps.executeUpdate() == 0){
                 throw new BadRequestException("Movies with this id doesn`t exist");
+            }
+        }
+    }
+
+    public Movie getById(long id) throws SQLException {
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try(PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                MovieDTO movieDTO = new MovieDTO(rs.getLong("id"),
+                                                        rs.getString("name"),
+                                                        rs.getString("description"),
+                                                        rs.getInt("runtime_in_min"),
+                                                        rs.getDate("premiere"),
+                                                        rs.getLong("genre_id"),
+                                                        rs.getLong("restriction_id"),
+                                                        rs.getDouble("rating"),
+                                                        rs.getBoolean("is_dubbed"),
+                                                        rs.getLong("video_fomat_id"),
+                                                        rs.getString("cast"),
+                                                        rs.getString("directors"));
+                return new Movie(movieDTO,
+                        genreDAO.getById(movieDTO.getGenre()),
+                        restrictionDAO.getById(movieDTO.getRestriction()),
+                        videoFormatDAO.getById(movieDTO.getVideoFormat()));
+            }
+            else{
+                return null;
             }
         }
     }

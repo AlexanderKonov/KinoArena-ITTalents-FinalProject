@@ -19,10 +19,8 @@ public class CinemaHallController {
 
     @Autowired
     CinemaHallDAO cinemaHallDAO;
-
     @Autowired
     CinemaHallTypeDAO cinemaHallTypeDAO;
-
     @Autowired
     CinemaDAO cinemaDAO;
 

@@ -6,26 +6,39 @@ import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.CinemaHallDTO;
+import season11.kino_arena.model.dto.MovieDTO;
+import season11.kino_arena.model.pojo.Cinema;
+import season11.kino_arena.model.pojo.CinemaHall;
+import season11.kino_arena.model.pojo.CinemaHallType;
+import season11.kino_arena.model.pojo.Movie;
 
 import java.sql.*;
 
 @Component
 public class CinemaHallDAO {
 
-    private static final String ADD_CINEMA_HALL_SQL = "INSERT INTO cinema_halls (cinema_hall_type_id , cinema_id , number_of_rows , number_of_seats_per_row)\n" +
-            "VALUES (? , ? , ? , ?)";
-    private static final String EDIT_CINEMA_HALL_SQL =
-            "UPDATE cinema_halls " +
-            "SET " +
-            "cinema_hall_type_id = ?, " +
-            "cinema_id = ?, " +
-            "number_of_rows = ?, " +
-            "number_of_seats_per_row = ? " +
-            "WHERE " +
-            "id=?";
+    private static final String ADD_CINEMA_HALL_SQL = "INSERT INTO cinema_halls " +
+                                                        "(cinema_hall_type_id, " +
+                                                        "cinema_id, " +
+                                                        "number_of_rows, " +
+                                                        "number_of_seats_per_row)" +
+                                                        "VALUES (? , ? , ? , ?)";
+    private static final String EDIT_CINEMA_HALL_SQL ="UPDATE cinema_halls " +
+                                                        "SET " +
+                                                        "cinema_hall_type_id = ?, " +
+                                                        "cinema_id = ?, " +
+                                                        "number_of_rows = ?, " +
+                                                        "number_of_seats_per_row = ? " +
+                                                        "WHERE " +
+                                                        "id=?";
     private static final String DELETE_CINEMA_HALL_SQL = "DELETE FROM cinema_halls WHERE id= ?;";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    CinemaHallTypeDAO cinemaHallTypeDAO;
+    @Autowired
+    CinemaDAO cinemaDAO;
 
     public void addCinemaHall(CinemaHallDTO cinemaHall) throws SQLException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -65,5 +78,32 @@ public class CinemaHallDAO {
         }
     }
 
+    private static final String SELECT_BY_ID = "SELECT " +
+                                                "id, " +
+                                                "cinema_hall_type_id, " +
+                                                "cinema_id, " +
+                                                "number_of_rows, " +
+                                                "number_of_seats_per_row " +
+                                                "FROM cinema_halls WHERE id = ?";
 
+    public CinemaHall getById(long id) throws SQLException, NotFoundException {
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try(PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                CinemaHallDTO cinemaHallDTO = new CinemaHallDTO(rs.getLong("id"),
+                        rs.getLong("cinema_hall_type_id"),
+                        rs.getLong("cinema_id"),
+                        rs.getInt("number_of_rows"),
+                        rs.getInt("number_of_seats_per_row"));
+                return new CinemaHall(cinemaHallDTO,
+                        cinemaHallTypeDAO.getCinemaHallTypeById(cinemaHallDTO.getCinemaHallTypeId()),
+                        cinemaDAO.getCinemaById(cinemaHallDTO.getCinemaId()));
+            }
+            else{
+                return null;
+            }
+        }
+    }
 }

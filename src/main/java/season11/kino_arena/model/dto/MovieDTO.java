@@ -12,7 +12,7 @@ import java.sql.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddMovieDTO {
+public class MovieDTO {
 
     private long id;
     private String name;
