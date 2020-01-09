@@ -32,6 +32,13 @@ public class CinemaHallDAO {
                                                         "WHERE " +
                                                         "id=?";
     private static final String DELETE_CINEMA_HALL_SQL = "DELETE FROM cinema_halls WHERE id= ?;";
+    private static final String SELECT_BY_ID = "SELECT " +
+            "id, " +
+            "cinema_hall_type_id, " +
+            "cinema_id, " +
+            "number_of_rows, " +
+            "number_of_seats_per_row " +
+            "FROM cinema_halls WHERE id = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -77,14 +84,6 @@ public class CinemaHallDAO {
             }
         }
     }
-
-    private static final String SELECT_BY_ID = "SELECT " +
-                                                "id, " +
-                                                "cinema_hall_type_id, " +
-                                                "cinema_id, " +
-                                                "number_of_rows, " +
-                                                "number_of_seats_per_row " +
-                                                "FROM cinema_halls WHERE id = ?";
 
     public CinemaHall getById(long id) throws SQLException, NotFoundException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();

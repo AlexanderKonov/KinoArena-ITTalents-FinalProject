@@ -26,7 +26,6 @@ public class UserDAO {
             "personal_info, " +
             "create_time) " +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);";
-
     private static final String SELECT_USER_BY_USERNAME = "SELECT " +
             "id, " +
             "first_name, " +

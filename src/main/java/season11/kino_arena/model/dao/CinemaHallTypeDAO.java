@@ -11,7 +11,9 @@ import java.sql.*;
 
 @Component
 public class CinemaHallTypeDAO {
+
     private static final String GET_CINEMA_HALL_TYPE_BY_ID = "SELECT * FROM cinema_hall_types WHERE id = ?";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
