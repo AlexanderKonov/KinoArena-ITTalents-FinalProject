@@ -21,10 +21,8 @@ public class CinemaDAO {
             "city" +
             ")" +
             "VALUES (?,?,?,?,?);";
-
     private static final String DELETE_CINEMA_SQL = "DELETE FROM cinemas WHERE id= ?;";
-    private static final String EDIT_CINEMA_SQL =
-            "UPDATE cinemas " +
+    private static final String EDIT_CINEMA_SQL ="UPDATE cinemas " +
                     "SET " +
                     "name = ?, " +
                     "address = ?, " +
