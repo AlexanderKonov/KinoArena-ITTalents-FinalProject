@@ -1,10 +1,8 @@
 package season11.kino_arena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaDAO;
 import season11.kino_arena.model.dao.CinemaHallDAO;
@@ -37,14 +35,14 @@ public class CinemaHallController {
     }
 
     @PostMapping("/halls/edit")
-    public CinemaHall editCinemaHall(@RequestBody CinemaHallDTO updatedCinemaHall) throws SQLException, NotFoundException {
+    public CinemaHall editCinemaHall(@RequestBody CinemaHallDTO updatedCinemaHall) throws SQLException, NotFoundException, BadRequestException {
         cinemaHallDAO.updateCinemaHall(updatedCinemaHall);
         CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(updatedCinemaHall.getCinemaHallTypeId());
         Cinema cinema = cinemaDAO.getCinemaById(updatedCinemaHall.getCinemaId());
         return new CinemaHall(updatedCinemaHall,cinemaHallType,cinema);
     }
 
-    @PostMapping("/halls/delete/{id}")
+    @DeleteMapping("/halls/{id}")
     public String deleteCinemaHall(@PathVariable (name = "id") long id) throws NotFoundException, SQLException {
         cinemaHallDAO.deleteCinemaHall(id);
         return "Cinema hall deleted successfully";

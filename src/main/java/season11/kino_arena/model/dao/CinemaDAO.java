@@ -3,6 +3,7 @@ package season11.kino_arena.model.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.pojo.Cinema;
 
@@ -62,7 +63,7 @@ public class CinemaDAO {
         }
     }
 
-    public void updateCinema(Cinema cinema) throws SQLException {
+    public void updateCinema(Cinema cinema) throws SQLException, BadRequestException {
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try(PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_SQL)){
             ps.setString(1,cinema.getName());
@@ -71,7 +72,9 @@ public class CinemaDAO {
             ps.setString(4,cinema.getCinemaInfo());
             ps.setString(5,cinema.getCity());
             ps.setLong(6,cinema.getId());
-            ps.executeUpdate();
+            if(ps.executeUpdate()==0){
+                throw new BadRequestException("Cinema was not found.");
+            }
         }
     }
 
