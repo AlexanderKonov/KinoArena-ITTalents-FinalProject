@@ -33,8 +33,9 @@ public class ProjectionDAO {
     private JdbcTemplate jdbcTemplate;
 
     public void addProjection(ProjectionDTO projection) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement ps = connection.prepareStatement(ADD_PROJECTION_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(ADD_PROJECTION_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, projection.getMovie());
             ps.setLong(2, projection.getHall());
             ps.setTimestamp(3, Timestamp.valueOf(projection.getDateTime()));
@@ -46,8 +47,9 @@ public class ProjectionDAO {
     }
 
     public void editProjection(ProjectionDTO projection) throws SQLException, BadRequestException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement ps = connection.prepareStatement(EDIT_PROJECTION_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(EDIT_PROJECTION_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, projection.getMovie());
             ps.setLong(2, projection.getHall());
             ps.setTimestamp(3, Timestamp.valueOf(projection.getDateTime()));
@@ -58,9 +60,10 @@ public class ProjectionDAO {
         }
     }
     public ArrayList<ProjectionTimeAndDurationDTO> getAllProjectionsForHall(long hallId) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForHall = new ArrayList<>();
-        try(PreparedStatement ps = connection.prepareStatement(GET_ALL_PROJECTIONS_FOR_HALL)){
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(GET_ALL_PROJECTIONS_FOR_HALL)){
             ps.setLong(1, hallId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){

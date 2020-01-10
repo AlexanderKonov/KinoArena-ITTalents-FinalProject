@@ -16,8 +16,9 @@ public class GenreDAO {
     private JdbcTemplate jdbcTemplate;
 
     public Genre getById(long id) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if(rs.next()) {

@@ -37,8 +37,9 @@ public class CinemaDAO {
     private JdbcTemplate jdbcTemplate;
 
     public void addCinema(Cinema cinema) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(ADD_CINEMA_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(ADD_CINEMA_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, cinema.getName());
             ps.setString(2, cinema.getAddress());
             ps.setString(3, cinema.getTelephoneNumber());
@@ -52,8 +53,9 @@ public class CinemaDAO {
     }
 
     public void deleteCinema(long cinemaID) throws SQLException, NotFoundException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_SQL)){
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_SQL)){
             ps.setLong(1,cinemaID);
             if (ps.executeUpdate()==0) {
                 throw new NotFoundException("Cinema was not found.");
@@ -62,8 +64,10 @@ public class CinemaDAO {
     }
 
     public void updateCinema(Cinema cinema) throws SQLException, BadRequestException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_SQL)){
+
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_SQL)){
             ps.setString(1,cinema.getName());
             ps.setString(2,cinema.getAddress());
             ps.setString(3,cinema.getTelephoneNumber());
@@ -77,8 +81,9 @@ public class CinemaDAO {
     }
 
     public Cinema getCinemaById(long id) throws SQLException, NotFoundException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(GET_CINEMA_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(GET_CINEMA_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if(rs.next()) {

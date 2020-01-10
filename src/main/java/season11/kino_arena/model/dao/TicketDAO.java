@@ -21,8 +21,9 @@ public class TicketDAO {
                                                     "VALUES (?,?,?,?); ";
 
     public void addTicket(TicketDTO ticketDTO) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement ps = connection.prepareStatement(ADD_TICKET_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(ADD_TICKET_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, ticketDTO.getUser());
             ps.setLong(2, ticketDTO.getProjection());
             ps.setInt(3, ticketDTO.getRowNumber());

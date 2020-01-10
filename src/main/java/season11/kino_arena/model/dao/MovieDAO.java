@@ -68,8 +68,9 @@ public class MovieDAO {
     private VideoFormatDAO videoFormatDAO;
 
     public void addMovie(MovieDTO movie) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement ps = connection.prepareStatement(ADD_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(ADD_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, movie.getName());
             ps.setString(2, movie.getDescription());
             ps.setInt(3, movie.getRuntimeInMin());
@@ -89,8 +90,9 @@ public class MovieDAO {
     }
 
     public void deleteMovie(long id) throws SQLException, NotFoundException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement ps = connection.prepareStatement(DELETE_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(DELETE_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             if(ps.executeUpdate() == 0){
                 throw new NotFoundException("Movie was not found.");
@@ -99,8 +101,9 @@ public class MovieDAO {
     }
 
     public void editMovie(MovieDTO movie) throws SQLException, BadRequestException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement ps = connection.prepareStatement(EDIT_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(EDIT_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, movie.getName());
             ps.setString(2, movie.getDescription());
             ps.setInt(3, movie.getRuntimeInMin());
@@ -120,8 +123,9 @@ public class MovieDAO {
     }
 
     public Movie getById(long id) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if(rs.next()) {

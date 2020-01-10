@@ -18,8 +18,9 @@ public class CinemaHallTypeDAO {
     private JdbcTemplate jdbcTemplate;
 
     public CinemaHallType getCinemaHallTypeById(long id) throws SQLException, NotFoundException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement ps = connection.prepareStatement(GET_CINEMA_HALL_TYPE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(GET_CINEMA_HALL_TYPE_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {

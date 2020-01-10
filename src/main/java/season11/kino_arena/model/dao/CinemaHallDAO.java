@@ -48,8 +48,9 @@ public class CinemaHallDAO {
     CinemaDAO cinemaDAO;
 
     public void addCinemaHall(CinemaHallDTO cinemaHall) throws SQLException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(ADD_CINEMA_HALL_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(ADD_CINEMA_HALL_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, cinemaHall.getCinemaHallTypeId());
             ps.setLong(2, cinemaHall.getCinemaId());
             ps.setInt(3, cinemaHall.getNumberOfRows());
@@ -62,8 +63,9 @@ public class CinemaHallDAO {
     }
 
     public void updateCinemaHall(CinemaHallDTO cinemaHall) throws SQLException, BadRequestException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_HALL_SQL)){
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_HALL_SQL)){
             ps.setLong(1,cinemaHall.getCinemaHallTypeId());
             ps.setLong(2,cinemaHall.getCinemaId());
             ps.setInt(3,cinemaHall.getNumberOfRows());
@@ -76,8 +78,9 @@ public class CinemaHallDAO {
     }
 
     public void deleteCinemaHall(long id) throws SQLException, NotFoundException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_HALL_SQL)){
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_HALL_SQL)){
             ps.setLong(1,id);
             if (ps.executeUpdate()==0) {
                 throw new NotFoundException("Cinema hall was not found.");
@@ -86,8 +89,9 @@ public class CinemaHallDAO {
     }
 
     public CinemaHall getById(long id) throws SQLException, NotFoundException {
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try(PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if(rs.next()) {
