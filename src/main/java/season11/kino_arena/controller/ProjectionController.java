@@ -1,9 +1,6 @@
 package season11.kino_arena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
@@ -34,6 +31,7 @@ public class ProjectionController {
     @PostMapping("/projections/add")
     public Projection addProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall = projectionDAO.getAllProjectionsForHall(reqProjection.getHall());
+        allProjectionsForTheChosenHall.sort((p1,p2)->p1.getDateTime().compareTo(p2.getDateTime()));
         ProjectionTimeAndDurationDTO projectionToBeAdded =
                 new ProjectionTimeAndDurationDTO(reqProjection.getDateTime(),movieDAO.getById(reqProjection.getMovie()).getRuntimeInMin());
         if (thereIsSpace(allProjectionsForTheChosenHall,projectionToBeAdded)){
@@ -49,6 +47,7 @@ public class ProjectionController {
 
     @PutMapping("/projections")
     public Projection editProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
+        //TODO validation
         projectionDAO.editProjection(reqProjection);
         return new Projection(reqProjection,
                 movieDAO.getById(reqProjection.getMovie()),
@@ -57,7 +56,7 @@ public class ProjectionController {
 
     @DeleteMapping("projections/{id}")
     public MessageDTO deleteProjection(@PathVariable(name = "id") long id) throws NotFoundException, SQLException {
-        ticketDAO.deleteTickets(id);
+        ticketDAO.deleteTicketsByProjectionId(id);
         projectionDAO.deleteProjection(id);
         return new MessageDTO("Projection deleted successfully.");
     }

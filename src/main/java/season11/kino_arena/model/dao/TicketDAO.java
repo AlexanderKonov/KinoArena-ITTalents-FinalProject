@@ -15,6 +15,8 @@ import java.util.ArrayList;
 public class TicketDAO {
 
     private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
+    private static final String GET_ALL_RESERVED_TICKETS_FOR_PROJECTION =
+            "SELECT `row_number` , seat_number FROM tickets WHERE projection_id = ?";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -75,7 +77,7 @@ public class TicketDAO {
         return tickets;
     }
 
-    public void deleteTickets(long projectionId) throws SQLException {
+    public void deleteTicketsByProjectionId(long projectionId) throws SQLException {
         try(
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_PROJECTION_ID)){
@@ -84,4 +86,17 @@ public class TicketDAO {
         }
     }
 
+    public ArrayList<TicketWithoutUserDTO> getReservedTicketsByProjectionId(long projectionId) throws SQLException {
+        ArrayList<TicketWithoutUserDTO> allReservedTickets = new ArrayList<>();
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(GET_ALL_RESERVED_TICKETS_FOR_PROJECTION)){
+            ps.setLong(1, projectionId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                allReservedTickets.add(new TicketWithoutUserDTO(rs.getInt("row_number"),
+                        rs.getInt("seat_number")));
+            }
+        }
+        return allReservedTickets;
+    }
 }
