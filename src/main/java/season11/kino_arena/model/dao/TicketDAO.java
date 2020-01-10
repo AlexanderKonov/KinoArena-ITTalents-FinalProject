@@ -14,6 +14,16 @@ import java.util.ArrayList;
 @Component
 public class TicketDAO {
 
+    private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
+    private static final String GET_ALL_RESERVED_TICKETS_FOR_PROJECTION =
+            "SELECT `row_number` , seat_number FROM tickets WHERE projection_id = ?";
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ProjectionDAO projectionDAO;
+    @Autowired
+    private UserDAO userDAO;
+
     private static final String ADD_TICKET_SQL = "INSERT INTO tickets " +
             "(user_id, " +
             "projection_id, " +
@@ -89,6 +99,18 @@ public class TicketDAO {
             PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_ID)){
             ps.setLong(1,id);
             ps.executeUpdate();
+
+    public ArrayList<TicketWithoutUserDTO> getReservedTicketsByProjectionId(long projectionId) throws SQLException {
+        ArrayList<TicketWithoutUserDTO> allReservedTickets = new ArrayList<>();
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(GET_ALL_RESERVED_TICKETS_FOR_PROJECTION)){
+            ps.setLong(1, projectionId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                allReservedTickets.add(new TicketWithoutUserDTO(rs.getInt("row_number"),
+                        rs.getInt("seat_number")));
+            }
         }
+        return allReservedTickets;
     }
 }

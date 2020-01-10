@@ -32,6 +32,7 @@ public class ProjectionController {
     @PostMapping("/projections/add")
     public Projection addProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall = projectionDAO.getAllProjectionsForHall(reqProjection.getHall());
+        allProjectionsForTheChosenHall.sort((p1,p2)->p1.getDateTime().compareTo(p2.getDateTime()));
         ProjectionTimeAndDurationDTO projectionToBeAdded =
                 new ProjectionTimeAndDurationDTO(reqProjection.getDateTime(),movieDAO.getById(reqProjection.getMovie()).getRuntimeInMin());
         if (thereIsSpace(allProjectionsForTheChosenHall,projectionToBeAdded)){
@@ -47,6 +48,7 @@ public class ProjectionController {
 
     @PutMapping("/projections")
     public Projection editProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
+        //TODO validation
         projectionDAO.editProjection(reqProjection);
         return new Projection(reqProjection,
                 movieDAO.getById(reqProjection.getMovie()),

@@ -21,7 +21,6 @@ public class UserController {
 
     @Autowired
     private UserDAO userDao;
-
     @PostMapping("/register")
     public UserWithoutPasswordDTO register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException, BadRequestException {
         //TODO validate data in userDto
