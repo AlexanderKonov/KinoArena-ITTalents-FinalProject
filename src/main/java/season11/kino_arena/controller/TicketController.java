@@ -3,6 +3,7 @@ package season11.kino_arena.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
+import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.ProjectionDAO;
 import season11.kino_arena.model.dao.TicketDAO;
@@ -30,6 +31,10 @@ public class TicketController {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
+        }
+    public TicketResponseDTO addTicket(@RequestBody TicketDTO ticketDTO) throws SQLException, NotFoundException, BadRequestException {
+        if(ticketDAO.tickedIsReserved(ticketDTO)){
+            throw new BadRequestException("Ticket is already reserved.");
         }
         ticketDAO.addTicket(ticketDTO);
         return new TicketResponseDTO(ticketDTO.getId(),
