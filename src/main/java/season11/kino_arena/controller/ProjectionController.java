@@ -31,7 +31,8 @@ public class ProjectionController {
 
     @PostMapping("/projections/add")
     public Projection addProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
-        ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall = projectionDAO.getAllProjectionsForHall(reqProjection.getHall());
+        ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall =
+                projectionDAO.getAllProjectionsForHall(reqProjection.getHall(),reqProjection.getId());
         allProjectionsForTheChosenHall.sort((p1,p2)->p1.getDateTime().compareTo(p2.getDateTime()));
         ProjectionTimeAndDurationDTO projectionToBeAdded =
                 new ProjectionTimeAndDurationDTO(reqProjection.getDateTime(),movieDAO.getById(reqProjection.getMovie()).getRuntimeInMin());
@@ -48,11 +49,23 @@ public class ProjectionController {
 
     @PutMapping("/projections")
     public Projection editProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
-        //TODO validation
+        if (reqProjection.getId()==0){
+            throw new BadRequestException("Projection ID is missing.");
+        }
+        ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall =
+                projectionDAO.getAllProjectionsForHall(reqProjection.getHall(),reqProjection.getId());
+        allProjectionsForTheChosenHall.sort((p1,p2)->p1.getDateTime().compareTo(p2.getDateTime()));
+        ProjectionTimeAndDurationDTO projectionToBeEdited =
+                new ProjectionTimeAndDurationDTO(reqProjection.getDateTime(),movieDAO.getById(reqProjection.getMovie()).getRuntimeInMin());
+        if (thereIsSpace(allProjectionsForTheChosenHall,projectionToBeEdited)){
         projectionDAO.editProjection(reqProjection);
         return new Projection(reqProjection,
                 movieDAO.getById(reqProjection.getMovie()),
                 cinemaHallDAO.getById(reqProjection.getHall()));
+        }
+        else {
+            throw new BadRequestException("Projection can not be edited to this state, due to the time interval.");
+        }
     }
 
     @DeleteMapping("projections/{id}")

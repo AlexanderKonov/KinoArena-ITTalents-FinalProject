@@ -18,9 +18,9 @@ import java.util.ArrayList;
 @Component
 public class ProjectionDAO {
 
-    private static final String GET_ALL_PROJECTIONS_FOR_HALL = "SELECT date_time, runtime_in_min FROM projections " +
-            "JOIN movies " +
-            "WHERE cinema_hall_id = ?";
+    private static final String GET_ALL_PROJECTIONS_FOR_HALL = "SELECT p.id AS id , p.date_time AS date_time , " +
+            "m.runtime_in_min AS runtime_in_min FROM projections AS p " +
+            "JOIN movies AS m ON p.movie_id = m.id WHERE p.cinema_hall_id = ?";
     private static final String ADD_PROJECTION_SQL = "INSERT INTO projections (" +
             "movie_id, " +
             "cinema_hall_id, " +
@@ -82,13 +82,16 @@ public class ProjectionDAO {
         }
     }
 
-    public ArrayList<ProjectionTimeAndDurationDTO> getAllProjectionsForHall(long hallId) throws SQLException {
+    public ArrayList<ProjectionTimeAndDurationDTO> getAllProjectionsForHall(long hallId, long projectionID) throws SQLException {
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForHall = new ArrayList<>();
         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = connection.prepareStatement(GET_ALL_PROJECTIONS_FOR_HALL)){
             ps.setLong(1, hallId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
+                if (rs.getLong("id")==projectionID){
+                    continue;
+                }
                 allProjectionsForHall.add(new ProjectionTimeAndDurationDTO(rs.getTimestamp("date_time").toLocalDateTime(),
                         rs.getInt("runtime_in_min")));
             }
