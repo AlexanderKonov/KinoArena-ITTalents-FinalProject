@@ -17,6 +17,12 @@ public class TicketDAO {
             "SELECT `row_number` , seat_number FROM tickets WHERE projection_id = ?";
     private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
     private static final String DELETE_ALL_TICKETS_BY_ID = "DELETE FROM tickets WHERE id = ?";
+    private static final String DELETE_ALL_TICKETS_EXCEEDING_HALL_SIZE =
+            "DELETE t FROM tickets AS t " +
+                    "JOIN projections AS p ON t.projection_id = p.id " +
+                    "WHERE p.cinema_hall_id = ? AND (t.`row_number` > ? OR t.seat_number > ? )";
+    private static final String SELECT_TICKET_BY_PROJECTION_AND_SEAT =
+            "SELECT * FROM tickets WHERE projection_id = ? AND `row_number` = ? AND seat_number = ? ";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -107,5 +113,26 @@ public class TicketDAO {
             }
         }
         return allReservedTickets;
+    }
+
+    public void deleteTicketsAfterHallResize(int numberOfRows, int numberOfSeatsPerRow, long hallID) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_EXCEEDING_HALL_SIZE)) {
+            ps.setLong(1, hallID);
+            ps.setInt(2,numberOfRows);
+            ps.setInt(3,numberOfSeatsPerRow);
+            ps.executeUpdate();
+        }
+    }
+
+    public boolean tickedIsReserved(TicketDTO ticketDTO) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(SELECT_TICKET_BY_PROJECTION_AND_SEAT)) {
+            ps.setLong(1, ticketDTO.getProjection());
+            ps.setInt(2,ticketDTO.getRowNumber());
+            ps.setInt(3,ticketDTO.getSeatNumber());
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        }
     }
 }
