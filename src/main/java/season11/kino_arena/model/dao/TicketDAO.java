@@ -5,6 +5,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.*;
+import season11.kino_arena.exceptions.NotFoundException;
+import season11.kino_arena.model.dto.TicketDTO;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 @Component
 public class TicketDAO {
 
+    private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -70,6 +73,15 @@ public class TicketDAO {
             }
         }
         return tickets;
+    }
+
+    public void deleteTickets(long projectionId) throws SQLException {
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_PROJECTION_ID)){
+                ps.setLong(1,projectionId);
+                ps.executeUpdate();
+        }
     }
 
 }

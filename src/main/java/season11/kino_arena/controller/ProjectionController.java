@@ -1,15 +1,17 @@
 package season11.kino_arena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaHallDAO;
 import season11.kino_arena.model.dao.MovieDAO;
 import season11.kino_arena.model.dao.ProjectionDAO;
+import season11.kino_arena.model.dao.TicketDAO;
+import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.dto.ProjectionDTO;
 import season11.kino_arena.model.dto.ProjectionTimeAndDurationDTO;
 import season11.kino_arena.model.pojo.Projection;
@@ -26,6 +28,8 @@ public class ProjectionController {
     private MovieDAO movieDAO;
     @Autowired
     private CinemaHallDAO cinemaHallDAO;
+    @Autowired
+    private TicketDAO ticketDAO;
 
     @PostMapping("/projections/add")
     public Projection addProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
@@ -50,6 +54,14 @@ public class ProjectionController {
                 movieDAO.getById(reqProjection.getMovie()),
                 cinemaHallDAO.getById(reqProjection.getHall()));
     }
+
+    @DeleteMapping("projections/{id}")
+    public MessageDTO deleteProjection(@PathVariable(name = "id") long id) throws NotFoundException, SQLException {
+        ticketDAO.deleteTickets(id);
+        projectionDAO.deleteProjection(id);
+        return new MessageDTO("Projection deleted successfully.");
+    }
+
     //Validation methods for adding new projection:
     private boolean thereIsSpace(ArrayList<ProjectionTimeAndDurationDTO> projections, ProjectionTimeAndDurationDTO newProjection){
         if (projections.isEmpty()){

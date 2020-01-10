@@ -5,6 +5,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
+import season11.kino_arena.exceptions.NotFoundException;
+import season11.kino_arena.model.dto.MovieDTO;
 import season11.kino_arena.model.dto.ProjectionDTO;
 import season11.kino_arena.model.dto.ProjectionTimeAndDurationDTO;
 import season11.kino_arena.model.pojo.Projection;
@@ -35,6 +37,7 @@ public class ProjectionDAO {
             "cinema_hall_id, " +
             "date_time " +
             "FROM projections WHERE id = ?";
+    private static final String DELETE_PROJECTION_SQL = "DELETE FROM projections WHERE id= ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -98,6 +101,16 @@ public class ProjectionDAO {
             }
             else{
                 return null;
+            }
+        }
+    }
+    public void deleteProjection(long projectionId) throws SQLException, NotFoundException {
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(DELETE_PROJECTION_SQL)){
+            ps.setLong(1,projectionId);
+            if (ps.executeUpdate()==0) {
+                throw new NotFoundException("Projection was not found.");
             }
         }
     }
