@@ -58,6 +58,8 @@ public class MovieDAO {
                                                 "directors " +
                                                 "FROM movies WHERE id = ?";
 
+    private static final String SELECT_BY_MULTIPLE_FIELDS = "SELECT * FROM movies WHERE name= ? AND premiere = ? ";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -119,6 +121,16 @@ public class MovieDAO {
             if(ps.executeUpdate() == 0){
                 throw new BadRequestException("Movies with this id doesn`t exist");
             }
+        }
+    }
+
+    public boolean movieExists(MovieDTO movie) throws SQLException {
+        try (
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(SELECT_BY_MULTIPLE_FIELDS)) {
+            ps.setString(1, movie.getName());
+            ps.setDate(2, movie.getPremiere());
+            return ps.executeQuery().next();
         }
     }
 

@@ -27,7 +27,10 @@ public class MovieController {
     private VideoFormatDAO videoFormatDAO;
 
     @PostMapping("/movies/add")
-    public Movie addMovie(@RequestBody MovieDTO reqMovie) throws SQLException {
+    public Movie addMovie(@RequestBody MovieDTO reqMovie) throws SQLException, BadRequestException {
+        if (movieDAO.movieExists(reqMovie)){
+            throw new BadRequestException("Movie already exists.");
+        }
         movieDAO.addMovie(reqMovie);
         return new Movie(reqMovie,
                 genreDAO.getById(reqMovie.getGenre()),
@@ -38,7 +41,6 @@ public class MovieController {
     @DeleteMapping("/movies/{id}")
     public MessageDTO deleteCinema(@PathVariable(name = "id") long id) throws SQLException, NotFoundException {
         movieDAO.deleteMovie(id);
-        //TODO change the plain text to something better
         return new MessageDTO("Movie deleted successfully!");
     }
 

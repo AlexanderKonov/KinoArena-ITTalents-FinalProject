@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaDAO;
+import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.pojo.Cinema;
 
 import java.sql.SQLException;
@@ -29,10 +30,9 @@ public class CinemaController {
     }
 
     @DeleteMapping("cinemas/{id}")
-    public String deleteCinema(@PathVariable(name = "id") long id) throws NotFoundException, SQLException {
+    public MessageDTO deleteCinema(@PathVariable(name = "id") long id) throws NotFoundException, SQLException {
         cinemaDAO.deleteCinema(id);
-        //TODO change the plain text to something better
-        return "Cinema deleted successfully!";
+        return new MessageDTO("Cinema deleted successfully.");
     }
 
     @GetMapping("/cinemas")

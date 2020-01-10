@@ -49,10 +49,10 @@ public class TicketController {
     }
 
     @DeleteMapping("/tickets/{id}")
-    public String deleteTicket(@PathVariable(name = "id") long id) throws SQLException {
+    public MessageDTO deleteTicket(@PathVariable(name = "id") long id) throws SQLException {
         ticketDAO.deleteTicketById(id);
         //TODO change the plain text to something better
-        return "Ticket deleted successfully!";
+        return new MessageDTO("Ticket was deleted successfully.");
     }
 
     @GetMapping("/projection/{projectionID}/tickets/free")

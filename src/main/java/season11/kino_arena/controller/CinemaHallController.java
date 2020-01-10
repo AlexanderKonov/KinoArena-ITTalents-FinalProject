@@ -9,6 +9,7 @@ import season11.kino_arena.model.dao.CinemaHallDAO;
 import season11.kino_arena.model.dao.CinemaHallTypeDAO;
 import season11.kino_arena.model.dao.TicketDAO;
 import season11.kino_arena.model.dto.CinemaHallDTO;
+import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.pojo.Cinema;
 import season11.kino_arena.model.pojo.CinemaHall;
 import season11.kino_arena.model.pojo.CinemaHallType;
@@ -48,8 +49,8 @@ public class CinemaHallController {
     }
 
     @DeleteMapping("/halls/{id}")
-    public String deleteCinemaHall(@PathVariable (name = "id") long id) throws NotFoundException, SQLException {
+    public MessageDTO deleteCinemaHall(@PathVariable (name = "id") long id) throws NotFoundException, SQLException {
         cinemaHallDAO.deleteCinemaHall(id);
-        return "Cinema hall deleted successfully";
+        return new MessageDTO("Cinema hall deleted successfully.");
     }
 }
