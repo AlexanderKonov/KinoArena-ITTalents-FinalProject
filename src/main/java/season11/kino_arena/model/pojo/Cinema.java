@@ -11,10 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cinema {
+
     private long id;
     private String name;
     private String address;
     private String telephoneNumber;
-    private  String city;
     private String cinemaInfo;
+    private String city;
+
 }

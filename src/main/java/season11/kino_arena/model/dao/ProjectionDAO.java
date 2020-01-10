@@ -32,11 +32,19 @@ public class ProjectionDAO {
                                                         "date_time = ? " +
                                                         "WHERE id = ?";
     private static final String SELECT_BY_ID = "SELECT " +
-            "id, " +
-            "movie_id, " +
-            "cinema_hall_id, " +
-            "date_time " +
-            "FROM projections WHERE id = ?";
+                                                "id, " +
+                                                "movie_id, " +
+                                                "cinema_hall_id, " +
+                                                "date_time " +
+                                                "FROM projections WHERE id = ?";
+    private static final String GET_ALL_PROJECTIONS_FOR_CINEMA = "SELECT " +
+                                                                    "p.id, " +
+                                                                    "p.movie_id, " +
+                                                                    "p.cinema_hall_id, " +
+                                                                    "p.date_time " +
+                                                                    "FROM projections AS p " +
+                                                                    "JOIN cinema_halls AS ch ON p.cinema_hall_id = ch.id " +
+                                                                    "WHERE ch.cinema_id = ?";
     private static final String DELETE_PROJECTION_SQL = "DELETE FROM projections WHERE id= ?";
 
     @Autowired
@@ -104,6 +112,7 @@ public class ProjectionDAO {
             }
         }
     }
+
     public void deleteProjection(long projectionId) throws SQLException, NotFoundException {
         try(
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -113,5 +122,21 @@ public class ProjectionDAO {
                 throw new NotFoundException("Projection was not found.");
             }
         }
+    }
+
+    public ArrayList<Projection> getAllProjectionForCertainCinema(long cinema_id) throws SQLException, NotFoundException {
+        ArrayList<Projection> projections = new ArrayList<>();
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(GET_ALL_PROJECTIONS_FOR_CINEMA)){
+            ps.setLong(1, cinema_id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                projections.add(new Projection(rs.getLong("id"),
+                    movieDAO.getById(rs.getLong("movie_id")),
+                    cinemaHallDAO.getById(rs.getLong("cinema_hall_id")),
+                    rs.getTimestamp("date_time").toLocalDateTime()));
+            }
+        }
+        return projections;
     }
 }

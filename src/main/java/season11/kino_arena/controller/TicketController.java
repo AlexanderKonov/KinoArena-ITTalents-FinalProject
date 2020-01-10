@@ -35,4 +35,11 @@ public class TicketController {
     public ArrayList<TicketResponseDTO> getAllTicketsForCertainUser(@PathVariable(name = "id") long id) throws SQLException, NotFoundException {
         return ticketDAO.getAllTicketsForCertainUser(id);
     }
+
+    @DeleteMapping("/tickets/{id}")
+    public String deleteTicket(@PathVariable(name = "id") long id) throws SQLException {
+        ticketDAO.deleteTicketById(id);
+        //TODO change the plain text to something better
+        return "Ticket deleted successfully!";
+    }
 }

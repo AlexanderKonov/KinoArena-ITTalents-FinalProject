@@ -42,15 +42,6 @@ public class UserController {
         return userWithoutPassword;
     }
 
-    public boolean userIsRegistered(RegisterUserDTO u) throws SQLException {
-        return userDao.getByUsername(u.getUsername())!=null;
-    }
-
-    public boolean hasValidPassword(RegisterUserDTO u) {
-        return !(!(u.getPassword().equals(u.getConfirmPassword())) || u.getPassword().contains(" ") || u.getPassword().length() < 8);
-        //return !u.getPassword().equals(u.getConfirmPassword()) && !u.getPassword().contains(" ") && u.getPassword().length() >= 8;
-    }
-
     @PostMapping("/login")
     public UserWithoutPasswordDTO login (@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException {
         User user = userDao.getByUsername(loginUserDTO.getUsername());
@@ -69,15 +60,22 @@ public class UserController {
         return null;
     }
 
+    @PostMapping("/logout")
+    public void login(HttpSession session){
+        session.invalidate();
+    }
 
     private boolean passwordValid(User user, LoginUserDTO userDTO) {
         //TODO validate pass
         return true;
     }
 
-    @PostMapping("/logout")
-    public void login(HttpSession session){
-        session.invalidate();
+    public boolean userIsRegistered(RegisterUserDTO u) throws SQLException {
+        return userDao.getByUsername(u.getUsername())!=null;
     }
 
+    public boolean hasValidPassword(RegisterUserDTO u) {
+        return !(!(u.getPassword().equals(u.getConfirmPassword())) || u.getPassword().contains(" ") || u.getPassword().length() < 8);
+        //return !u.getPassword().equals(u.getConfirmPassword()) && !u.getPassword().contains(" ") && u.getPassword().length() >= 8;
+    }
 }

@@ -1,9 +1,6 @@
 package season11.kino_arena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
@@ -14,6 +11,7 @@ import season11.kino_arena.model.dao.TicketDAO;
 import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.dto.ProjectionDTO;
 import season11.kino_arena.model.dto.ProjectionTimeAndDurationDTO;
+import season11.kino_arena.model.dto.TicketResponseDTO;
 import season11.kino_arena.model.pojo.Projection;
 
 import java.sql.SQLException;
@@ -57,9 +55,15 @@ public class ProjectionController {
 
     @DeleteMapping("projections/{id}")
     public MessageDTO deleteProjection(@PathVariable(name = "id") long id) throws NotFoundException, SQLException {
-        ticketDAO.deleteTickets(id);
+        ticketDAO.deleteTicketsByProjectionId(id);
         projectionDAO.deleteProjection(id);
         return new MessageDTO("Projection deleted successfully.");
+    }
+
+    @GetMapping("/projections/{cinema_id}")
+    public ArrayList<Projection> getAllProjectionForCertainCinema(@PathVariable(name = "cinema_id") long cinema_id)
+                                                                                throws SQLException, NotFoundException {
+        return projectionDAO.getAllProjectionForCertainCinema(cinema_id);
     }
 
     //Validation methods for adding new projection:

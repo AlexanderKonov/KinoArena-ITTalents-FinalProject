@@ -14,14 +14,6 @@ import java.util.ArrayList;
 @Component
 public class TicketDAO {
 
-    private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private ProjectionDAO projectionDAO;
-    @Autowired
-    private UserDAO userDAO;
-
     private static final String ADD_TICKET_SQL = "INSERT INTO tickets " +
             "(user_id, " +
             "projection_id, " +
@@ -35,6 +27,15 @@ public class TicketDAO {
             "`row_number`, " +
             "seat_number " +
             "FROM tickets WHERE user_id = ?";
+    private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
+    private static final String DELETE_ALL_TICKETS_BY_ID = "DELETE FROM tickets WHERE id = ?";
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ProjectionDAO projectionDAO;
+    @Autowired
+    private UserDAO userDAO;
 
     public void addTicket(TicketDTO ticketDTO) throws SQLException {
         try (
@@ -75,13 +76,19 @@ public class TicketDAO {
         return tickets;
     }
 
-    public void deleteTickets(long projectionId) throws SQLException {
-        try(
-                Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_PROJECTION_ID)){
-                ps.setLong(1,projectionId);
-                ps.executeUpdate();
+    public void deleteTicketsByProjectionId(long projectionId) throws SQLException {
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_PROJECTION_ID)){
+            ps.setLong(1,projectionId);
+            ps.executeUpdate();
         }
     }
 
+    public void deleteTicketById(long id) throws SQLException {
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_ID)){
+            ps.setLong(1,id);
+            ps.executeUpdate();
+        }
+    }
 }

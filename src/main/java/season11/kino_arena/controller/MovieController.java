@@ -8,6 +8,7 @@ import season11.kino_arena.model.dao.GenreDAO;
 import season11.kino_arena.model.dao.MovieDAO;
 import season11.kino_arena.model.dao.RestrictionDAO;
 import season11.kino_arena.model.dao.VideoFormatDAO;
+import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.dto.MovieDTO;
 import season11.kino_arena.model.pojo.Movie;
 
@@ -35,10 +36,10 @@ public class MovieController {
     }
 
     @DeleteMapping("/movies/{id}")
-    public String deleteCinema(@PathVariable(name = "id") long id) throws SQLException, NotFoundException {
+    public MessageDTO deleteCinema(@PathVariable(name = "id") long id) throws SQLException, NotFoundException {
         movieDAO.deleteMovie(id);
         //TODO change the plain text to something better
-        return "Movie deleted successfully!";
+        return new MessageDTO("Movie deleted successfully!");
     }
 
     @PutMapping("/movies")

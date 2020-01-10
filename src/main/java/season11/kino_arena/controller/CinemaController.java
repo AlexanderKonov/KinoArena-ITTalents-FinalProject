@@ -8,6 +8,7 @@ import season11.kino_arena.model.dao.CinemaDAO;
 import season11.kino_arena.model.pojo.Cinema;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 @RestController
 public class CinemaController {
@@ -21,7 +22,7 @@ public class CinemaController {
         return cinema;
     }
 
-    @PutMapping("cinemas/")
+    @PutMapping("cinemas")
     public Cinema editCinema(@RequestBody Cinema cinema) throws SQLException, NotFoundException, BadRequestException {
         cinemaDAO.updateCinema(cinema);
         return cinema;
@@ -33,4 +34,16 @@ public class CinemaController {
         //TODO change the plain text to something better
         return "Cinema deleted successfully!";
     }
+
+    @GetMapping("/cinemas")
+    public ArrayList<Cinema> getAllCinemas() throws SQLException {
+        return cinemaDAO.getAllCinemas();
+    }
+
+    @GetMapping("/cinemas/{city}")
+    public ArrayList<Cinema> getAllCinemasByCity(@PathVariable(name = "city") String city) throws SQLException, BadRequestException {
+        ArrayList<Cinema> cinemas = cinemaDAO.getAllCinemasByCity(city);
+        return cinemas;
+    }
+
 }
