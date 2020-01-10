@@ -3,6 +3,7 @@ package season11.kino_arena.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.model.dto.ErrorDTO;
 
@@ -40,5 +41,16 @@ public abstract class AbstractController {
                 LocalDateTime.now(),
                 e.getClass().getName()
         );
+    }
+
+    @ExceptionHandler({AuthorizationException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorDTO handleUnauthorized(Exception e){
+        ErrorDTO errorDTO = new ErrorDTO(
+                e.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
     }
 }

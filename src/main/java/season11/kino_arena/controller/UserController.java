@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.model.dao.UserDAO;
 import season11.kino_arena.model.dto.LoginUserDTO;
@@ -23,30 +24,33 @@ public class UserController {
     private UserDAO userDao;
     @PostMapping("/register")
     public UserWithoutPasswordDTO register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException, BadRequestException {
-        //TODO validate data in userDto
-        //create User object
-        if (userIsRegistered(userDto)){
-            throw new BadRequestException("This username is already taken.");
+        if (isEmailTaken(userDto)){
+            throw new BadRequestException("This email is taken.");
         }
-        if (!hasValidPassword(userDto)){
-            throw new BadRequestException("Invalid password.");
+        if (isUsernameTaken(userDto)){
+            throw new BadRequestException("This username is taken.");
+        }
+        if(!userDto.getPassword().equals(userDto.getConfirmPassword())){
+            throw new BadRequestException("Both password must be the same");
+        }
+        if (!hasValidPassword(userDto.getPassword())){
+            throw new BadRequestException("Password must be between 8 and 16 characters and must contain " +
+                    "one or more uppercase characters, " +
+                    "one or more lowercase characters, " +
+                    "one or more digits, " +
+                    "one or more special characters.");
         }
         User user = new User(userDto);
-        //add to database
         userDao.addUser(user);
-        //return UserWithoutPasswordDTO
-        //session.setAttribute(SESSION_KEY_LOGGED_USER, user);
-        //UserWithoutPasswordDTO responseDto = new UserWithoutPasswordDTO(user);
-        UserWithoutPasswordDTO userWithoutPassword = new UserWithoutPasswordDTO(user);
-        return userWithoutPassword;
+        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
+        return new UserWithoutPasswordDTO(user);
     }
 
     @PostMapping("/login")
-    public UserWithoutPasswordDTO login (@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException {
+    public UserWithoutPasswordDTO login(@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException {
         User user = userDao.getByUsername(loginUserDTO.getUsername());
         if(user == null){
-            //throw new AuthorizationException("Invalid credentials");
-            return null;
+            throw new AuthorizationException("Invalid credentials");
         }
         else
         if(passwordValid(user, loginUserDTO)) {
@@ -54,13 +58,12 @@ public class UserController {
             return new UserWithoutPasswordDTO(user);
         }
         else{
-            //throw new AuthorizationException("Invalid credentials");
+            throw new AuthorizationException("Invalid credentials");
         }
-        return null;
     }
 
     @PostMapping("/logout")
-    public void login(HttpSession session){
+    public void logout(HttpSession session){
         session.invalidate();
     }
 
@@ -69,12 +72,38 @@ public class UserController {
         return true;
     }
 
-    public boolean userIsRegistered(RegisterUserDTO u) throws SQLException {
-        return userDao.getByUsername(u.getUsername())!=null;
+    public boolean isUsernameTaken(RegisterUserDTO u) throws SQLException {
+        return userDao.getByUsername(u.getUsername()) != null ;
     }
 
-    public boolean hasValidPassword(RegisterUserDTO u) {
-        return !(!(u.getPassword().equals(u.getConfirmPassword())) || u.getPassword().contains(" ") || u.getPassword().length() < 8);
-        //return !u.getPassword().equals(u.getConfirmPassword()) && !u.getPassword().contains(" ") && u.getPassword().length() >= 8;
+    public boolean isEmailTaken(RegisterUserDTO u) throws SQLException {
+        return userDao.getByEmail(u.getEmail()) != null;
+    }
+
+    public boolean hasValidPassword(String password) {
+        int min = 8;
+        int max = 16;
+        int digit = 0;
+        int special = 0;
+        int upCount = 0;
+        int loCount = 0;
+        if(password.length() >= min && password.length() <= max){
+            for(int i = 0; i < password.length(); i++){
+                char c = password.charAt(i);
+                if(Character.isUpperCase(c)){
+                    upCount++;
+                }
+                if(Character.isLowerCase(c)){
+                    loCount++;
+                }
+                if(Character.isDigit(c)){
+                    digit++;
+                }
+                if(c >= 33 && c <= 46 || c==64){
+                    special++;
+                }
+            }
+        }
+        return special >= 1 && loCount >= 1 && upCount >= 1 && digit >= 1;
     }
 }
