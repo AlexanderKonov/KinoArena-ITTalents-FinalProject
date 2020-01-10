@@ -3,22 +3,35 @@ package season11.kino_arena.model.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import season11.kino_arena.model.dto.TicketDTO;
+import season11.kino_arena.exceptions.NotFoundException;
+import season11.kino_arena.model.dto.*;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 @Component
 public class TicketDAO {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ProjectionDAO projectionDAO;
+    @Autowired
+    private UserDAO userDAO;
 
     private static final String ADD_TICKET_SQL = "INSERT INTO tickets " +
-                                                    "(user_id, " +
-                                                    "projection_id, " +
-                                                    "`row_number`, " +
-                                                    "seat_number) " +
-                                                    "VALUES (?,?,?,?); ";
+            "(user_id, " +
+            "projection_id, " +
+            "`row_number`, " +
+            "seat_number) " +
+            "VALUES (?,?,?,?); ";
+    private static final String SELECT_TICKETS_BY_USER_ID = "SELECT " +
+            "id, " +
+            "user_id, " +
+            "projection_id, " +
+            "`row_number`, " +
+            "seat_number " +
+            "FROM tickets WHERE user_id = ?";
 
     public void addTicket(TicketDTO ticketDTO) throws SQLException {
         try (
@@ -33,6 +46,30 @@ public class TicketDAO {
             keys.next();
             ticketDTO.setId(keys.getLong(1));
         }
+    }
+
+    public ArrayList<TicketResponseDTO> getAllTicketsForCertainUser(long id) throws SQLException, NotFoundException {
+        ArrayList<TicketResponseDTO> tickets = new ArrayList<>();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(SELECT_TICKETS_BY_USER_ID)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                TicketDTO ticketDTO = new TicketDTO(rs.getLong("id"),
+                        rs.getLong("user_id"),
+                        rs.getLong("projection_id"),
+                        rs.getInt("row_number"),
+                        rs.getInt("seat_number"));
+
+                tickets.add(
+                        new TicketResponseDTO(ticketDTO.getId(),
+                                new UserForTicketDTO(userDAO.getById(ticketDTO.getUser())),
+                                new ProjectionForTicketDTO(projectionDAO.getById(ticketDTO.getProjection())),
+                                ticketDTO.getRowNumber(),
+                                ticketDTO.getSeatNumber()));
+            }
+        }
+        return tickets;
     }
 
 }

@@ -8,7 +8,6 @@ import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.pojo.Cinema;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 
 @Component
 public class CinemaDAO {

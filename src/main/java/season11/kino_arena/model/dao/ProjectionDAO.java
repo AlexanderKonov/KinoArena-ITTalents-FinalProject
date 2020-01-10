@@ -4,11 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.BadRequestException;
-import season11.kino_arena.model.dto.MovieDTO;
+import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.ProjectionDTO;
 import season11.kino_arena.model.dto.ProjectionTimeAndDurationDTO;
+import season11.kino_arena.model.pojo.Projection;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Component
@@ -17,7 +19,6 @@ public class ProjectionDAO {
     private static final String GET_ALL_PROJECTIONS_FOR_HALL = "SELECT date_time, runtime_in_min FROM projections " +
             "JOIN movies " +
             "WHERE cinema_hall_id = ?";
-
     private static final String ADD_PROJECTION_SQL = "INSERT INTO projections (" +
             "movie_id, " +
             "cinema_hall_id, " +
@@ -28,9 +29,19 @@ public class ProjectionDAO {
                                                         "cinema_hall_id = ?, " +
                                                         "date_time = ? " +
                                                         "WHERE id = ?";
+    private static final String SELECT_BY_ID = "SELECT " +
+            "id, " +
+            "movie_id, " +
+            "cinema_hall_id, " +
+            "date_time " +
+            "FROM projections WHERE id = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private MovieDAO movieDAO;
+    @Autowired
+    private CinemaHallDAO cinemaHallDAO;
 
     public void addProjection(ProjectionDTO projection) throws SQLException {
         try (
@@ -59,11 +70,11 @@ public class ProjectionDAO {
             }
         }
     }
+
     public ArrayList<ProjectionTimeAndDurationDTO> getAllProjectionsForHall(long hallId) throws SQLException {
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForHall = new ArrayList<>();
-        try(
-                Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement ps = connection.prepareStatement(GET_ALL_PROJECTIONS_FOR_HALL)){
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(GET_ALL_PROJECTIONS_FOR_HALL)){
             ps.setLong(1, hallId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()){
@@ -74,4 +85,20 @@ public class ProjectionDAO {
         return allProjectionsForHall;
     }
 
+    public Projection getById(long id) throws SQLException, NotFoundException {
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()) {
+                return new Projection(rs.getLong("id"),
+                        movieDAO.getById(rs.getLong("movie_id")),
+                        cinemaHallDAO.getById(rs.getLong("cinema_hall_id")),
+                        rs.getTimestamp("date_time").toLocalDateTime());
+            }
+            else{
+                return null;
+            }
+        }
+    }
 }

@@ -16,6 +16,7 @@ import java.sql.SQLException;
 @Setter
 @NoArgsConstructor
 public class CinemaHall {
+
     private long id;
     private CinemaHallType cinemaHallType;
     private Cinema cinema;
