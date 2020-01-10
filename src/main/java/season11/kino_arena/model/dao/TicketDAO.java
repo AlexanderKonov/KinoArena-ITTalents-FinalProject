@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.*;
-import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.TicketDTO;
 
 import java.sql.*;
@@ -14,9 +13,11 @@ import java.util.ArrayList;
 @Component
 public class TicketDAO {
 
-    private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
     private static final String GET_ALL_RESERVED_TICKETS_FOR_PROJECTION =
             "SELECT `row_number` , seat_number FROM tickets WHERE projection_id = ?";
+    private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
+    private static final String DELETE_ALL_TICKETS_BY_ID = "DELETE FROM tickets WHERE id = ?";
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
@@ -37,15 +38,7 @@ public class TicketDAO {
             "`row_number`, " +
             "seat_number " +
             "FROM tickets WHERE user_id = ?";
-    private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
-    private static final String DELETE_ALL_TICKETS_BY_ID = "DELETE FROM tickets WHERE id = ?";
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private ProjectionDAO projectionDAO;
-    @Autowired
-    private UserDAO userDAO;
 
     public void addTicket(TicketDTO ticketDTO) throws SQLException {
         try (
@@ -95,12 +88,14 @@ public class TicketDAO {
     }
 
     public void deleteTicketById(long id) throws SQLException {
-        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
-            PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_ID)){
-            ps.setLong(1,id);
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_ID)) {
+            ps.setLong(1, id);
             ps.executeUpdate();
+        }
+    }
 
-    public ArrayList<TicketWithoutUserDTO> getReservedTicketsByProjectionId(long projectionId) throws SQLException {
+    public ArrayList<TicketWithoutUserDTO> getReservedTicketsByProjectionId (long projectionId) throws SQLException {
         ArrayList<TicketWithoutUserDTO> allReservedTickets = new ArrayList<>();
         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = connection.prepareStatement(GET_ALL_RESERVED_TICKETS_FOR_PROJECTION)){
