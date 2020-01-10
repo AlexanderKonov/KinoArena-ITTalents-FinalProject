@@ -27,12 +27,11 @@ public class TicketController {
     private TicketDAO ticketDAO;
 
     @PostMapping("/tickets/add")
-    public TicketResponseDTO addTicket(@RequestBody TicketDTO ticketDTO, HttpSession session) throws SQLException, NotFoundException {
+    public TicketResponseDTO addTicket(@RequestBody TicketDTO ticketDTO, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
         }
-    public TicketResponseDTO addTicket(@RequestBody TicketDTO ticketDTO) throws SQLException, NotFoundException, BadRequestException {
         if(ticketDAO.tickedIsReserved(ticketDTO)){
             throw new BadRequestException("Ticket is already reserved.");
         }
@@ -69,7 +68,7 @@ public class TicketController {
 
     @GetMapping("/projection/{projectionID}/tickets/reserved")
     public ArrayList<TicketWithoutUserDTO> getReservedTickets(
-                     @PathVariable(name = "projectionID") long projectionID, HttpSession session) throws SQLException {
+            @PathVariable(name = "projectionID") long projectionID, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
@@ -82,7 +81,7 @@ public class TicketController {
         boolean[][] hallMatrix = new boolean[cinemaHall.getNumberOfRows()][cinemaHall.getNumberOfSeatsPerRow()];
         for (TicketWithoutUserDTO ticket :
                 taken) {
-                hallMatrix[ticket.getRowNumber()][ticket.getSeatNumber()] = true;
+            hallMatrix[ticket.getRowNumber()][ticket.getSeatNumber()] = true;
         }
         ArrayList<TicketWithoutUserDTO> freeTickets = new ArrayList<>();
         for (int row = 0; row < hallMatrix.length; row++) {
