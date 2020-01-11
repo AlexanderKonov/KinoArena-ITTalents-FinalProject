@@ -18,13 +18,15 @@ public class CinemaController {
     CinemaDAO cinemaDAO;
 
     @PostMapping("/cinemas/add")
-    public Cinema addCinema(@RequestBody Cinema cinema) throws SQLException {
+    public Cinema addCinema(@RequestBody Cinema cinema) throws SQLException, BadRequestException {
+        validateCinemaData(cinema);
         cinemaDAO.addCinema(cinema);
         return cinema;
     }
 
     @PutMapping("cinemas")
-    public Cinema editCinema(@RequestBody Cinema cinema) throws SQLException, NotFoundException, BadRequestException {
+    public Cinema editCinema(@RequestBody Cinema cinema) throws SQLException, BadRequestException {
+        validateCinemaData(cinema);
         cinemaDAO.updateCinema(cinema);
         return cinema;
     }
@@ -41,9 +43,30 @@ public class CinemaController {
     }
 
     @GetMapping("/cinemas/{city}")
-    public ArrayList<Cinema> getAllCinemasByCity(@PathVariable(name = "city") String city) throws SQLException, BadRequestException {
+    public ArrayList<Cinema> getAllCinemasByCity(@PathVariable(name = "city") String city) throws SQLException {
         ArrayList<Cinema> cinemas = cinemaDAO.getAllCinemasByCity(city);
         return cinemas;
     }
 
+    private void validateCinemaData(Cinema cinema) throws BadRequestException {
+        if (!isValidPhone(cinema.getTelephoneNumber())){
+            throw new BadRequestException("Telephone number is ot valid.");
+        }
+        if (!isValidCity(cinema.getCity())){
+            throw new BadRequestException("City is not valid.");
+        }
+        if (!isValidAddress(cinema.getAddress())){
+            throw new BadRequestException("Address is not valid.");
+        }
+    }
+    private boolean isValidCity(String city){
+        return city.matches( "([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+)" );
+    }
+    private boolean isValidPhone(String phone){
+        return phone.matches( "\\d{10}|(?:\\d{3}-){2}\\d{4}|\\(\\d{3}\\)\\d{3}-?\\d{4}");
+    }
+    private boolean isValidAddress( String address )
+    {
+        return address.matches("^[#.0-9a-zA-Z\\s,-]+$" );
+    }
 }

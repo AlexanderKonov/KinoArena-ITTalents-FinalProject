@@ -28,6 +28,7 @@ public class MovieController {
 
     @PostMapping("/movies/add")
     public Movie addMovie(@RequestBody MovieDTO reqMovie) throws SQLException, BadRequestException {
+        validateMovieData(reqMovie);
         if (movieDAO.movieExists(reqMovie)){
             throw new BadRequestException("Movie already exists.");
         }
@@ -46,6 +47,7 @@ public class MovieController {
 
     @PutMapping("/movies")
     public Movie editMovie(@RequestBody MovieDTO reqMovie) throws SQLException, BadRequestException {
+        validateMovieData(reqMovie);
         movieDAO.editMovie(reqMovie);
         return new Movie(reqMovie,
                 genreDAO.getById(reqMovie.getGenre()),
@@ -53,4 +55,26 @@ public class MovieController {
                 videoFormatDAO.getById(reqMovie.getVideoFormat()));
     }
 
+    private void validateMovieData(MovieDTO movie) throws BadRequestException {
+        if (!runtimeIsValid(movie.getRuntimeInMin())){
+            throw new BadRequestException("Movie is too short or too long.");
+        }
+        if (movie.getRating()<0||movie.getRating()>10){
+            throw new BadRequestException("Rating value is not correct.");
+        }
+        if (!nameIsValid(movie.getCast())){
+            throw new BadRequestException("Cast value is not correct.");
+        }
+        if (!nameIsValid(movie.getDirector())){
+            throw new BadRequestException("Director value is not correct.");
+        }
+    }
+
+    private boolean runtimeIsValid(int runtime){
+        return runtime>0 && runtime < 300;
+    }
+
+    private boolean nameIsValid(String name){
+        return name.matches("^[\\p{L} ,.'-]+$");
+    }
 }
