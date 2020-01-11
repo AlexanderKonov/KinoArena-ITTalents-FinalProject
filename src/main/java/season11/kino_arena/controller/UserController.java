@@ -24,22 +24,7 @@ public class UserController {
     private UserDAO userDao;
     @PostMapping("/register")
     public UserWithoutPasswordDTO register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException, BadRequestException {
-        if (isEmailTaken(userDto)){
-            throw new BadRequestException("This email is taken.");
-        }
-        if (isUsernameTaken(userDto)){
-            throw new BadRequestException("This username is taken.");
-        }
-        if(!userDto.getPassword().equals(userDto.getConfirmPassword())){
-            throw new BadRequestException("Both passwords must be the same");
-        }
-        if (!hasValidPassword(userDto.getPassword())){
-            throw new BadRequestException("Password must be between 8 and 16 characters and must contain " +
-                    "one or more uppercase characters, " +
-                    "one or more lowercase characters, " +
-                    "one or more digits, " +
-                    "one or more special characters.");
-        }
+        validateUserData(userDto);
         User user = new User(userDto);
         userDao.addUser(user);
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);
@@ -72,15 +57,15 @@ public class UserController {
         return true;
     }
 
-    public boolean isUsernameTaken(RegisterUserDTO u) throws SQLException {
+    private boolean isUsernameTaken(RegisterUserDTO u) throws SQLException {
         return userDao.getByUsername(u.getUsername()) != null ;
     }
 
-    public boolean isEmailTaken(RegisterUserDTO u) throws SQLException {
+    private boolean isEmailTaken(RegisterUserDTO u) throws SQLException {
         return userDao.getByEmail(u.getEmail()) != null;
     }
 
-    public boolean hasValidPassword(String password) {
+    private boolean hasValidPassword(String password) {
         int min = 8;
         int max = 16;
         int digit = 0;
@@ -105,5 +90,24 @@ public class UserController {
             }
         }
         return special >= 1 && loCount >= 1 && upCount >= 1 && digit >= 1;
+    }
+
+    private void validateUserData(RegisterUserDTO userDto) throws BadRequestException, SQLException {
+        if (isEmailTaken(userDto)){
+            throw new BadRequestException("This email is taken.");
+        }
+        if (isUsernameTaken(userDto)){
+            throw new BadRequestException("This username is taken.");
+        }
+        if(!userDto.getPassword().equals(userDto.getConfirmPassword())){
+            throw new BadRequestException("Both passwords must be the same");
+        }
+        if (!hasValidPassword(userDto.getPassword())){
+            throw new BadRequestException("Password must be between 8 and 16 characters and must contain " +
+                    "one or more uppercase characters, " +
+                    "one or more lowercase characters, " +
+                    "one or more digits, " +
+                    "one or more special characters.");
+        }
     }
 }
