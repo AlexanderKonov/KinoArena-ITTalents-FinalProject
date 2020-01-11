@@ -12,20 +12,21 @@ import java.time.LocalDateTime;
 public class UserDAO {
 
     private static final String REGISTER_USER_SQL = "INSERT INTO users (" +
-            "first_name, " +
-            "second_name, " +
-            "last_name, " +
-            "username, " +
-            "email, " +
-            "password, " +
-            "city, " +
-            "post_code, " +
-            "address, " +
-            "education, " +
-            "job, " +
-            "personal_info, " +
-            "create_time) " +
+            "`first_name`, " +
+            "`second_name`, " +
+            "`last_name`, " +
+            "`username`, " +
+            "`email`, " +
+            "`password`, " +
+            "`city`, " +
+            "`post_code`, " +
+            "`address`, " +
+            "`education`, " +
+            "`job`, " +
+            "`personal_info`, " +
+            "`create_time`) " +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);";
+
     private static final String SELECT_USER_BY_USERNAME = "SELECT * " +
                                                             "FROM users " +
                                                             "WHERE username = ?;";
@@ -81,7 +82,8 @@ public class UserDAO {
                         rs.getString("education"),
                         rs.getString("job"),
                         rs.getString("personal_info"),
-                        rs.getTimestamp("create_time").toLocalDateTime());
+                        rs.getTimestamp("create_time").toLocalDateTime(),
+                        rs.getBoolean("is_admin"));
             }
             else{
                 return null;
@@ -108,7 +110,8 @@ public class UserDAO {
                         rs.getString("education"),
                         rs.getString("job"),
                         rs.getString("personal_info"),
-                        rs.getTimestamp("create_time").toLocalDateTime());
+                        rs.getTimestamp("create_time").toLocalDateTime(),
+                        rs.getBoolean("is_admin"));
             }
             else{
                 return null;
@@ -135,7 +138,8 @@ public class UserDAO {
                         rs.getString("education"),
                         rs.getString("job"),
                         rs.getString("personal_info"),
-                        rs.getTimestamp("create_time").toLocalDateTime());
+                        rs.getTimestamp("create_time").toLocalDateTime(),
+                        rs.getBoolean("is_admin"));
             }
             else{
                 return null;

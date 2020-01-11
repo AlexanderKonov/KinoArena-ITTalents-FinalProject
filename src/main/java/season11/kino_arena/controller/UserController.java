@@ -31,7 +31,7 @@ public class UserController {
             throw new BadRequestException("This username is taken.");
         }
         if(!userDto.getPassword().equals(userDto.getConfirmPassword())){
-            throw new BadRequestException("Both password must be the same");
+            throw new BadRequestException("Both passwords must be the same");
         }
         if (!hasValidPassword(userDto.getPassword())){
             throw new BadRequestException("Password must be between 8 and 16 characters and must contain " +
@@ -43,7 +43,7 @@ public class UserController {
         User user = new User(userDto);
         userDao.addUser(user);
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);
-        return new UserWithoutPasswordDTO(user);
+        return new UserWithoutPasswordDTO(userDao.getById(user.getId()));
     }
 
     @PostMapping("/login")

@@ -28,6 +28,7 @@ public class User {
     private String job;
     private String personalInfo;
     private LocalDateTime createTime;
+    private Boolean isAdmin;
 
     public User(RegisterUserDTO u){
         setFirstName(u.getFirstName());
@@ -42,6 +43,5 @@ public class User {
         setEducation(u.getEducation());
         setJob(u.getJob());
         setPersonalInfo(u.getPersonalInfo());
-        //setCreateTime(LocalDateTime.now());
     }
 }

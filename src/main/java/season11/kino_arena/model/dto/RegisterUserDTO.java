@@ -22,5 +22,4 @@ public class RegisterUserDTO {
     private String education;
     private String job;
     private String personalInfo;
-
 }
