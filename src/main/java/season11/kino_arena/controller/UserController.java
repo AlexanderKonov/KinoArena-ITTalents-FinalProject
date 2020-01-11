@@ -1,6 +1,9 @@
 package season11.kino_arena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,10 +25,13 @@ public class UserController {
 
     @Autowired
     private UserDAO userDao;
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
     @PostMapping("/register")
     public UserWithoutPasswordDTO register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException, BadRequestException {
         validateUserData(userDto);
         User user = new User(userDto);
+        user.setPassword(encoder.encode(userDto.getPassword()));
         userDao.addUser(user);
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);
         return new UserWithoutPasswordDTO(userDao.getById(user.getId()));
@@ -37,8 +43,7 @@ public class UserController {
         if(user == null){
             throw new AuthorizationException("Invalid credentials");
         }
-        else
-        if(passwordValid(user, loginUserDTO)) {
+        if(BCrypt.checkpw(loginUserDTO.getPassword(), user.getPassword())) {
             session.setAttribute(SESSION_KEY_LOGGED_USER, user);
             return new UserWithoutPasswordDTO(user);
         }

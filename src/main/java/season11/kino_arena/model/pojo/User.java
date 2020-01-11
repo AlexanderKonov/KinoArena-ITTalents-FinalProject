@@ -36,7 +36,6 @@ public class User {
         setLastName(u.getLastName());
         setUsername(u.getUsername());
         setEmail(u.getEmail());
-        setPassword(u.getPassword());
         setCity(u.getCity());
         setPostCode(u.getPostCode());
         setAddress(u.getAddress());
