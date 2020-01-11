@@ -26,7 +26,7 @@ public class CinemaController {
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
-        validateCinemaData(cinema);
+        validateCinemaData(cinema);//throws exception
         cinemaDAO.addCinema(cinema);
         return cinema;
     }
@@ -37,7 +37,7 @@ public class CinemaController {
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
-        validateCinemaData(cinema);
+        validateCinemaData(cinema);//throws exception
         cinemaDAO.updateCinema(cinema);
         return cinema;
     }
@@ -59,8 +59,7 @@ public class CinemaController {
 
     @GetMapping("/cinemas/{city}")
     public ArrayList<Cinema> getAllCinemasByCity(@PathVariable(name = "city") String city) throws SQLException {
-        ArrayList<Cinema> cinemas = cinemaDAO.getAllCinemasByCity(city);
-        return cinemas;
+        return cinemaDAO.getAllCinemasByCity(city);
     }
 
     private void validateCinemaData(Cinema cinema) throws BadRequestException {

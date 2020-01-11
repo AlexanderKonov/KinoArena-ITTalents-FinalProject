@@ -32,6 +32,11 @@ public class TicketController {
         if(user == null){
             throw new AuthorizationException();
         }
+        if(!user.getIsAdmin()){
+            if(user.getId() != ticketDTO.getUser()){
+                throw new AuthorizationException("You don`t have permissions for that");
+            }
+        }
         if(ticketDAO.tickedIsReserved(ticketDTO)){
             throw new BadRequestException("Ticket is already reserved.");
         }
