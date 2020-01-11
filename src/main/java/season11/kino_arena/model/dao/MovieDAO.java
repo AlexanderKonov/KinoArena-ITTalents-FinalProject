@@ -56,6 +56,8 @@ public class MovieDAO {
     private RestrictionDAO restrictionDAO;
     @Autowired
     private VideoFormatDAO videoFormatDAO;
+    @Autowired
+    private ProjectionDAO projectionDAO;
 
     public void addMovie(MovieDTO movie) throws SQLException {
         try (
@@ -80,6 +82,7 @@ public class MovieDAO {
     }
 
     public void deleteMovie(long id) throws SQLException, NotFoundException {
+        projectionDAO.deleteProjectionsByMovieId(id);
         try (
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(DELETE_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {

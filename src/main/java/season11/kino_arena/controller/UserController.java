@@ -37,7 +37,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserWithoutPasswordDTO login(@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException {
+    public UserWithoutPasswordDTO login(@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException, BadRequestException {
+        if (session.getAttribute(SESSION_KEY_LOGGED_USER) != null){
+            throw new BadRequestException("User is already logged. Please log out.");
+        }
         User user = userDao.getByUsername(loginUserDTO.getUsername());
         if(user == null){
             throw new AuthorizationException("Invalid credentials");

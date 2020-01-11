@@ -84,7 +84,7 @@ public class ProjectionController {
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
-        ticketDAO.deleteTicketsByProjectionId(id);
+        //ticketDAO.deleteTicketsByProjectionId(id);
         projectionDAO.deleteProjection(id);
         return new MessageDTO("Projection deleted successfully.");
     }

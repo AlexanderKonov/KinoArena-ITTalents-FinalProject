@@ -37,6 +37,8 @@ public class CinemaDAO {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private CinemaHallDAO cinemaHallDAO;
 
     public void addCinema(Cinema cinema) throws SQLException {
         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -54,6 +56,7 @@ public class CinemaDAO {
     }
 
     public void deleteCinema(long cinemaID) throws SQLException, NotFoundException {
+        cinemaHallDAO.deleteCinemaHallsByCinemaId(cinemaID);
         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_SQL)){
             ps.setLong(1,cinemaID);

@@ -46,6 +46,10 @@ public class ProjectionDAO {
                                                                     "JOIN cinema_halls AS ch ON p.cinema_hall_id = ch.id " +
                                                                     "WHERE ch.cinema_id = ?";
     private static final String DELETE_PROJECTION_SQL = "DELETE FROM projections WHERE id= ?";
+    private static final String DELETE_PROJECTION_BY_HALL_ID = "DELETE  FROM projections WHERE cinema_hall_id = ? ";
+    private static final String DELETE_PROJECTION_BY_MOVIE_ID = "DELETE  FROM projections WHERE movie_id = ? ";
+    private static final String GET_ALL_PROJECTIONS_IDS_FOR_HALL = "SELECT id FROM projections WHERE cinema_hall_id = ? ";
+    private static final String GET_ALL_PROJECTIONS_IDS_FOR_MOVIE = "SELECT id FROM projections WHERE movie_id = ? ";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -53,6 +57,8 @@ public class ProjectionDAO {
     private MovieDAO movieDAO;
     @Autowired
     private CinemaHallDAO cinemaHallDAO;
+    @Autowired
+    private TicketDAO ticketDAO;
 
     public void addProjection(ProjectionDTO projection) throws SQLException {
         try (
@@ -117,6 +123,7 @@ public class ProjectionDAO {
     }
 
     public void deleteProjection(long projectionId) throws SQLException, NotFoundException {
+        ticketDAO.deleteTicketsByProjectionId(projectionId);
         try(
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(DELETE_PROJECTION_SQL)){
@@ -126,6 +133,63 @@ public class ProjectionDAO {
             }
         }
     }
+
+    public void deleteProjectionsByHallId(long hallId) throws SQLException {
+        ArrayList<Long> projectionIdList = getAllProjectionsIdForHall(hallId);
+        for (long id :
+                projectionIdList) {
+            ticketDAO.deleteTicketsByProjectionId(id);
+        }
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(DELETE_PROJECTION_BY_HALL_ID)){
+            ps.setLong(1,hallId);
+            ps.executeUpdate();
+        }
+    }
+
+    private ArrayList<Long> getAllProjectionsIdForHall(long hallId) throws SQLException {
+        ArrayList<Long> projectionIds = new ArrayList<>();
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(GET_ALL_PROJECTIONS_IDS_FOR_HALL)){
+            ps.setLong(1, hallId);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                projectionIds.add(rs.getLong("id"));
+            }
+        }
+        return projectionIds;
+    }
+
+    public void deleteProjectionsByMovieId(long movieId) throws SQLException {
+        ArrayList<Long> projectionIdList = getAllProjectionsIdForMovie(movieId);
+        for (long id :
+                projectionIdList) {
+            ticketDAO.deleteTicketsByProjectionId(id);
+        }
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(DELETE_PROJECTION_BY_MOVIE_ID)){
+            ps.setLong(1,movieId);
+            ps.executeUpdate();
+        }
+    }
+
+    private ArrayList<Long> getAllProjectionsIdForMovie(long movieId) throws SQLException {
+        ArrayList<Long> projectionIds = new ArrayList<>();
+        try(
+                Connection connection = jdbcTemplate.getDataSource().getConnection();
+                PreparedStatement ps = connection.prepareStatement(GET_ALL_PROJECTIONS_IDS_FOR_MOVIE)){
+            ps.setLong(1, movieId);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                projectionIds.add(rs.getLong("id"));
+            }
+        }
+        return projectionIds;
+    }
+
 
     public ArrayList<Projection> getAllProjectionForCertainCinema(long cinema_id) throws SQLException, NotFoundException {
         ArrayList<Projection> projections = new ArrayList<>();
