@@ -3,6 +3,7 @@ package season11.kino_arena.model.dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.*;
 import season11.kino_arena.model.dto.TicketDTO;
@@ -23,6 +24,7 @@ public class TicketDAO {
                     "WHERE p.cinema_hall_id = ? AND (t.`row_number` > ? OR t.seat_number > ? )";
     private static final String SELECT_TICKET_BY_PROJECTION_AND_SEAT =
             "SELECT * FROM tickets WHERE projection_id = ? AND `row_number` = ? AND seat_number = ? ";
+    private static final String SELECT_TICKET_BY_ID = "SELECT user_id FROM tickets WHERE id = 1";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -133,6 +135,20 @@ public class TicketDAO {
             ps.setInt(3,ticketDTO.getSeatNumber());
             ResultSet rs = ps.executeQuery();
             return rs.next();
+        }
+    }
+
+    public long getUserIdByTicketId(long id) throws SQLException, NotFoundException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(SELECT_TICKET_BY_ID)) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                return rs.getLong("user_id");
+            }
+            else {
+                throw new NotFoundException("Ticket was not found.");
+            }
         }
     }
 }

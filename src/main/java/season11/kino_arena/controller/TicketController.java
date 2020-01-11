@@ -10,6 +10,7 @@ import season11.kino_arena.model.dao.TicketDAO;
 import season11.kino_arena.model.dao.UserDAO;
 import season11.kino_arena.model.dto.*;
 import season11.kino_arena.model.pojo.CinemaHall;
+import season11.kino_arena.model.pojo.Ticket;
 import season11.kino_arena.model.pojo.User;
 
 import javax.servlet.http.HttpSession;
@@ -31,6 +32,11 @@ public class TicketController {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
+        }
+        if(!user.getIsAdmin()){
+            if(user.getId() != ticketDTO.getUser()){
+                throw new AuthorizationException("You don`t have permissions for that");
+            }
         }
         if(ticketDAO.tickedIsReserved(ticketDTO)){
             throw new BadRequestException("Ticket is already reserved.");
@@ -59,18 +65,18 @@ public class TicketController {
     }
 
     @DeleteMapping("/tickets/{id}")
-    public MessageDTO deleteTicket(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
+    public MessageDTO deleteTicket(@PathVariable(name = "id") long id, HttpSession session) throws SQLException, NotFoundException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("You don`t have permissions for that");
         }
         if(!user.getIsAdmin()){
-            if(user.getId() != id){
+            long ticketUserId = ticketDAO.getUserIdByTicketId(id);
+            if(user.getId() != ticketUserId){
                 throw new AuthorizationException("You don`t have permissions for that");
             }
         }
         ticketDAO.deleteTicketById(id);
-        //TODO change the plain text to something better
         return new MessageDTO("Ticket was deleted successfully.");
     }
 

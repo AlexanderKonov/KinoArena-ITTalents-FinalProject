@@ -59,8 +59,7 @@ public class CinemaController {
 
     @GetMapping("/cinemas/{city}")
     public ArrayList<Cinema> getAllCinemasByCity(@PathVariable(name = "city") String city) throws SQLException {
-        ArrayList<Cinema> cinemas = cinemaDAO.getAllCinemasByCity(city);
-        return cinemas;
+        return cinemaDAO.getAllCinemasByCity(city);
     }
 
     private void validateCinemaData(Cinema cinema) throws BadRequestException {
