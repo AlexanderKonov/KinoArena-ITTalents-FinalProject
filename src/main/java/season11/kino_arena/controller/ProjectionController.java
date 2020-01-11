@@ -75,10 +75,24 @@ public class ProjectionController {
         return new MessageDTO("Projection deleted successfully.");
     }
 
-    @GetMapping("/projections/{cinema_id}")
-    public ArrayList<Projection> getAllProjectionForCertainCinema(@PathVariable(name = "cinema_id") long cinema_id)
+    @GetMapping("/projections/{cinemaId}")
+    public ArrayList<Projection> getAllProjectionForCertainCinema(@PathVariable(name = "cinemaId") long cinemaId)
                                                                                 throws SQLException, NotFoundException {
-        return projectionDAO.getAllProjectionForCertainCinema(cinema_id);
+        return projectionDAO.getAllProjectionForCertainCinema(cinemaId);
+    }
+
+    @GetMapping("projections/{cinemaId}/{projectionTypeId}")
+    public ArrayList<Projection> getAllProjectionsByCinemaAndProjectionType(@PathVariable(name = "cinemaId") long cinemaId,
+                                                                            @PathVariable(name = "projectionTypeId") long projectionTypeId) throws NotFoundException, SQLException {
+        ArrayList<Projection> allProjectionsForCinema = projectionDAO.getAllProjectionForCertainCinema(cinemaId);
+        ArrayList<Projection> result = new ArrayList<>();
+        for (Projection p :
+                allProjectionsForCinema) {
+            if (p.getMovie().getVideoFormat().getId() == projectionTypeId){
+                result.add(p);
+            }
+        }
+        return result;
     }
 
     //Validation methods for adding new projection:
