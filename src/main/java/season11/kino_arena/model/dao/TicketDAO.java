@@ -25,14 +25,6 @@ public class TicketDAO {
     private static final String SELECT_TICKET_BY_PROJECTION_AND_SEAT =
             "SELECT * FROM tickets WHERE projection_id = ? AND `row_number` = ? AND seat_number = ? ";
     private static final String SELECT_TICKET_BY_ID = "SELECT user_id FROM tickets WHERE id = 1";
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    @Autowired
-    private ProjectionDAO projectionDAO;
-    @Autowired
-    private UserDAO userDAO;
-
     private static final String ADD_TICKET_SQL = "INSERT INTO tickets " +
             "(user_id, " +
             "projection_id, " +
@@ -47,6 +39,12 @@ public class TicketDAO {
             "seat_number " +
             "FROM tickets WHERE user_id = ?";
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private ProjectionDAO projectionDAO;
+    @Autowired
+    private UserDAO userDAO;
 
     public void addTicket(TicketDTO ticketDTO) throws SQLException {
         try (

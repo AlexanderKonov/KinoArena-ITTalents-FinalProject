@@ -6,11 +6,7 @@ import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.CinemaHallDTO;
-import season11.kino_arena.model.dto.MovieDTO;
-import season11.kino_arena.model.pojo.Cinema;
 import season11.kino_arena.model.pojo.CinemaHall;
-import season11.kino_arena.model.pojo.CinemaHallType;
-import season11.kino_arena.model.pojo.Movie;
 
 import java.sql.*;
 

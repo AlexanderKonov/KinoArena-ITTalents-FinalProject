@@ -44,19 +44,7 @@ public class MovieDAO {
                                                 "directors = ?" +
                                                 "WHERE id = ?";
 
-    private static final String SELECT_BY_ID = "SELECT id, " +
-                                                "`name`, " +
-                                                "description, " +
-                                                "runtime_in_min, " +
-                                                "premiere, " +
-                                                "genre_id, " +
-                                                "restriction_id, " +
-                                                "rating, " +
-                                                "is_dubbed, " +
-                                                "video_fomat_id, " +
-                                                "`cast`, " +
-                                                "directors " +
-                                                "FROM movies WHERE id = ?";
+    private static final String SELECT_BY_ID = "SELECT * FROM movies WHERE id = ?";
 
     private static final String SELECT_BY_MULTIPLE_FIELDS = "SELECT * FROM movies WHERE name= ? AND premiere = ? ";
 
@@ -135,9 +123,8 @@ public class MovieDAO {
     }
 
     public Movie getById(long id) throws SQLException {
-        try(
-                Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if(rs.next()) {

@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
-import season11.kino_arena.model.dto.TicketResponseDTO;
 import season11.kino_arena.model.pojo.Cinema;
 
 import java.sql.*;

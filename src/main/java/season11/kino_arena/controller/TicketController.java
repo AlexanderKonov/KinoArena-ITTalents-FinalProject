@@ -10,7 +10,6 @@ import season11.kino_arena.model.dao.TicketDAO;
 import season11.kino_arena.model.dao.UserDAO;
 import season11.kino_arena.model.dto.*;
 import season11.kino_arena.model.pojo.CinemaHall;
-import season11.kino_arena.model.pojo.Ticket;
 import season11.kino_arena.model.pojo.User;
 
 import javax.servlet.http.HttpSession;

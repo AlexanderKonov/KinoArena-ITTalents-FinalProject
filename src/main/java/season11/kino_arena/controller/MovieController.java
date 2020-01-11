@@ -70,6 +70,15 @@ public class MovieController {
                 videoFormatDAO.getById(reqMovie.getVideoFormat()));
     }
 
+    @GetMapping("/movies/{id}")
+    public Movie getMoviebyId(@PathVariable(name = "id") long movieId) throws SQLException, NotFoundException {
+        Movie movie = movieDAO.getById(movieId);
+        if (movie == null){
+            throw new NotFoundException("This movie doesn`t exist");
+        }
+        return movie;
+    }
+
     private void validateMovieData(MovieDTO movie) throws BadRequestException {
         if (!runtimeIsValid(movie.getRuntimeInMin())){
             throw new BadRequestException("Movie is too short or too long.");

@@ -3,7 +3,6 @@ package season11.kino_arena.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,11 +54,6 @@ public class UserController {
     @PostMapping("/logout")
     public void logout(HttpSession session){
         session.invalidate();
-    }
-
-    private boolean passwordValid(User user, LoginUserDTO userDTO) {
-        //TODO validate pass
-        return true;
     }
 
     private boolean isUsernameTaken(RegisterUserDTO u) throws SQLException {

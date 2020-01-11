@@ -16,9 +16,8 @@ public class RestrictionDAO {
     private JdbcTemplate jdbcTemplate;
 
     public Restriction getById(long id) throws SQLException {
-        try(
-                Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if(rs.next()) {
