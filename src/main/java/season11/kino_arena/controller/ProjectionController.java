@@ -2,6 +2,7 @@ package season11.kino_arena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaHallDAO;
@@ -11,9 +12,10 @@ import season11.kino_arena.model.dao.TicketDAO;
 import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.dto.ProjectionDTO;
 import season11.kino_arena.model.dto.ProjectionTimeAndDurationDTO;
-import season11.kino_arena.model.dto.TicketResponseDTO;
 import season11.kino_arena.model.pojo.Projection;
+import season11.kino_arena.model.pojo.User;
 
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -30,7 +32,11 @@ public class ProjectionController {
     private TicketDAO ticketDAO;
 
     @PostMapping("/projections/add")
-    public Projection addProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
+    public Projection addProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall =
                 projectionDAO.getAllProjectionsForHall(reqProjection.getHall(),reqProjection.getId());
         allProjectionsForTheChosenHall.sort((p1,p2)->p1.getDateTime().compareTo(p2.getDateTime()));
@@ -48,7 +54,11 @@ public class ProjectionController {
     }
 
     @PutMapping("/projections")
-    public Projection editProjection(@RequestBody ProjectionDTO reqProjection) throws SQLException, NotFoundException, BadRequestException {
+    public Projection editProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         if (reqProjection.getId()==0){
             throw new BadRequestException("Projection ID is missing.");
         }
@@ -69,7 +79,11 @@ public class ProjectionController {
     }
 
     @DeleteMapping("projections/{id}")
-    public MessageDTO deleteProjection(@PathVariable(name = "id") long id) throws NotFoundException, SQLException {
+    public MessageDTO deleteProjection(@PathVariable(name = "id") long id, HttpSession session) throws NotFoundException, SQLException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         ticketDAO.deleteTicketsByProjectionId(id);
         projectionDAO.deleteProjection(id);
         return new MessageDTO("Projection deleted successfully.");

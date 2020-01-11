@@ -44,12 +44,31 @@ public class TicketController {
     }
 
     @GetMapping("/users/{id}/tickets")
-    public ArrayList<TicketResponseDTO> getAllTicketsForCertainUser(@PathVariable(name = "id") long id) throws SQLException, NotFoundException {
+    public ArrayList<TicketResponseDTO> getAllTicketsForCertainUser(@PathVariable(name = "id") long id, HttpSession session)
+                                                                                throws SQLException, NotFoundException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
+        if(!user.getIsAdmin()){
+            if(user.getId() != id){
+                throw new AuthorizationException("You don`t have permissions for that");
+            }
+        }
         return ticketDAO.getAllTicketsForCertainUser(id);
     }
 
     @DeleteMapping("/tickets/{id}")
-    public MessageDTO deleteTicket(@PathVariable(name = "id") long id) throws SQLException {
+    public MessageDTO deleteTicket(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
+        if(!user.getIsAdmin()){
+            if(user.getId() != id){
+                throw new AuthorizationException("You don`t have permissions for that");
+            }
+        }
         ticketDAO.deleteTicketById(id);
         //TODO change the plain text to something better
         return new MessageDTO("Ticket was deleted successfully.");

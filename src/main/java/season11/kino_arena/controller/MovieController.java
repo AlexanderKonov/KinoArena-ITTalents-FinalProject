@@ -2,6 +2,7 @@ package season11.kino_arena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.GenreDAO;
@@ -11,7 +12,9 @@ import season11.kino_arena.model.dao.VideoFormatDAO;
 import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.dto.MovieDTO;
 import season11.kino_arena.model.pojo.Movie;
+import season11.kino_arena.model.pojo.User;
 
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 
 @RestController
@@ -27,7 +30,11 @@ public class MovieController {
     private VideoFormatDAO videoFormatDAO;
 
     @PostMapping("/movies/add")
-    public Movie addMovie(@RequestBody MovieDTO reqMovie) throws SQLException, BadRequestException {
+    public Movie addMovie(@RequestBody MovieDTO reqMovie, HttpSession session) throws SQLException, BadRequestException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         validateMovieData(reqMovie);
         if (movieDAO.movieExists(reqMovie)){
             throw new BadRequestException("Movie already exists.");
@@ -40,13 +47,21 @@ public class MovieController {
     }
 
     @DeleteMapping("/movies/{id}")
-    public MessageDTO deleteCinema(@PathVariable(name = "id") long id) throws SQLException, NotFoundException {
+    public MessageDTO deleteMovie(@PathVariable(name = "id") long id, HttpSession session) throws SQLException, NotFoundException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         movieDAO.deleteMovie(id);
         return new MessageDTO("Movie deleted successfully!");
     }
 
     @PutMapping("/movies")
-    public Movie editMovie(@RequestBody MovieDTO reqMovie) throws SQLException, BadRequestException {
+    public Movie editMovie(@RequestBody MovieDTO reqMovie, HttpSession session) throws SQLException, BadRequestException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         validateMovieData(reqMovie);
         movieDAO.editMovie(reqMovie);
         return new Movie(reqMovie,

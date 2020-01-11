@@ -2,6 +2,7 @@ package season11.kino_arena.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaDAO;
@@ -13,7 +14,9 @@ import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.pojo.Cinema;
 import season11.kino_arena.model.pojo.CinemaHall;
 import season11.kino_arena.model.pojo.CinemaHallType;
+import season11.kino_arena.model.pojo.User;
 
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 
 @RestController
@@ -29,7 +32,11 @@ public class CinemaHallController {
     TicketDAO ticketDAO;
 
     @PostMapping("/halls/add")
-    public CinemaHall addCinemaHall(@RequestBody CinemaHallDTO cinemaHallWithIndexes) throws SQLException, NotFoundException {
+    public CinemaHall addCinemaHall(@RequestBody CinemaHallDTO cinemaHallWithIndexes, HttpSession session) throws SQLException, NotFoundException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         cinemaHallDAO.addCinemaHall(cinemaHallWithIndexes);
         CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(cinemaHallWithIndexes.getCinemaHallTypeId());
         Cinema cinema = cinemaDAO.getCinemaById(cinemaHallWithIndexes.getCinemaId());
@@ -37,7 +44,11 @@ public class CinemaHallController {
     }
 
     @PutMapping("/halls")
-    public CinemaHall editCinemaHall(@RequestBody CinemaHallDTO updatedCinemaHall) throws SQLException, NotFoundException, BadRequestException {
+    public CinemaHall editCinemaHall(@RequestBody CinemaHallDTO updatedCinemaHall, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         CinemaHall oldHall = cinemaHallDAO.getById(updatedCinemaHall.getId());
         cinemaHallDAO.updateCinemaHall(updatedCinemaHall);
         if (updatedCinemaHall.getNumberOfRows()<oldHall.getNumberOfRows()||updatedCinemaHall.getNumberOfSeatsPerRow()<oldHall.getNumberOfSeatsPerRow()){
@@ -49,7 +60,11 @@ public class CinemaHallController {
     }
 
     @DeleteMapping("/halls/{id}")
-    public MessageDTO deleteCinemaHall(@PathVariable (name = "id") long id) throws NotFoundException, SQLException {
+    public MessageDTO deleteCinemaHall(@PathVariable (name = "id") long id, HttpSession session) throws NotFoundException, SQLException {
+        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        if(user == null || !user.getIsAdmin()){
+            throw new AuthorizationException("You don`t have permissions for that");
+        }
         cinemaHallDAO.deleteCinemaHall(id);
         return new MessageDTO("Cinema hall deleted successfully.");
     }
