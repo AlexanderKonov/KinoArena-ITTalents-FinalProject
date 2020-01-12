@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
-import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaDAO;
 import season11.kino_arena.model.dao.CinemaHallDAO;
 import season11.kino_arena.model.dao.CinemaHallTypeDAO;
@@ -34,7 +33,7 @@ public class CinemaHallController {
     TicketDAO ticketDAO;
 
     @PostMapping("/halls/add")
-    public CinemaHall addCinemaHall(@RequestBody CinemaHallDTO cinemaHallWithIndexes, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
+    public CinemaHall addCinemaHall(@RequestBody CinemaHallDTO cinemaHallWithIndexes, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -47,7 +46,7 @@ public class CinemaHallController {
     }
 
     @PutMapping("/halls")
-    public CinemaHall editCinemaHall(@RequestBody CinemaHallDTO updatedCinemaHall, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
+    public CinemaHall editCinemaHall(@RequestBody CinemaHallDTO updatedCinemaHall, HttpSession session) throws SQLException{
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -64,7 +63,7 @@ public class CinemaHallController {
     }
 
     @DeleteMapping("/halls/{id}")
-    public MessageDTO deleteCinemaHall(@PathVariable (name = "id") long id, HttpSession session) throws NotFoundException, SQLException {
+    public MessageDTO deleteCinemaHall(@PathVariable (name = "id") long id, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");

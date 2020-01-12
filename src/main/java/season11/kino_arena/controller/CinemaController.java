@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
-import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaDAO;
 import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.pojo.Cinema;
@@ -21,7 +20,7 @@ public class CinemaController {
     CinemaDAO cinemaDAO;
 
     @PostMapping("/cinemas/add")
-    public Cinema addCinema(@RequestBody Cinema cinema, HttpSession session) throws SQLException, BadRequestException {
+    public Cinema addCinema(@RequestBody Cinema cinema, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -32,7 +31,7 @@ public class CinemaController {
     }
 
     @PutMapping("cinemas")
-    public Cinema editCinema(@RequestBody Cinema cinema, HttpSession session) throws SQLException, BadRequestException {
+    public Cinema editCinema(@RequestBody Cinema cinema, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -43,7 +42,7 @@ public class CinemaController {
     }
 
     @DeleteMapping("cinemas/{id}")
-    public MessageDTO deleteCinema(@PathVariable(name = "id") long id, HttpSession session) throws NotFoundException, SQLException {
+    public MessageDTO deleteCinema(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");

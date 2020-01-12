@@ -27,7 +27,7 @@ public class TicketController {
     private TicketDAO ticketDAO;
 
     @PostMapping("/tickets/add")
-    public TicketResponseDTO addTicket(@RequestBody TicketDTO ticketDTO, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
+    public TicketResponseDTO addTicket(@RequestBody TicketDTO ticketDTO, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
@@ -49,8 +49,7 @@ public class TicketController {
     }
 
     @GetMapping("/users/{id}/tickets")
-    public ArrayList<TicketResponseDTO> getAllTicketsForCertainUser(@PathVariable(name = "id") long id, HttpSession session)
-                                                                                throws SQLException, NotFoundException {
+    public ArrayList<TicketResponseDTO> getAllTicketsForCertainUser(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -64,7 +63,7 @@ public class TicketController {
     }
 
     @DeleteMapping("/tickets/{id}")
-    public MessageDTO deleteTicket(@PathVariable(name = "id") long id, HttpSession session) throws SQLException, NotFoundException {
+    public MessageDTO deleteTicket(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -81,7 +80,7 @@ public class TicketController {
 
     @GetMapping("/projection/{projectionID}/tickets/free")
     public ArrayList<TicketWithoutUserDTO> getFreeTicketsForProjection(
-            @PathVariable(name = "projectionID") long projectionID, HttpSession session) throws SQLException, NotFoundException {
+            @PathVariable(name = "projectionID") long projectionID, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
@@ -100,7 +99,7 @@ public class TicketController {
         return ticketDAO.getReservedTicketsByProjectionId(projectionID);
     }
 
-    private ArrayList<TicketWithoutUserDTO> getFreeTickets(ArrayList<TicketWithoutUserDTO> taken , long projectionID) throws NotFoundException, SQLException {
+    private ArrayList<TicketWithoutUserDTO> getFreeTickets(ArrayList<TicketWithoutUserDTO> taken , long projectionID) throws SQLException {
         CinemaHall cinemaHall = projectionDAO.getById(projectionID).getHall();
         boolean[][] hallMatrix = new boolean[cinemaHall.getNumberOfRows()][cinemaHall.getNumberOfSeatsPerRow()];
         for (TicketWithoutUserDTO ticket :

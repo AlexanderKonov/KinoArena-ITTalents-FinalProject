@@ -27,7 +27,7 @@ public class UserController {
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
-    public UserWithoutPasswordDTO register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException, BadRequestException {
+    public UserWithoutPasswordDTO register(@RequestBody RegisterUserDTO userDto, HttpSession session) throws SQLException {
         validateUserData(userDto);
         User user = new User(userDto);
         user.setPassword(encoder.encode(userDto.getPassword()));
@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserWithoutPasswordDTO login(@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException, BadRequestException {
+    public UserWithoutPasswordDTO login(@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException {
         if (session.getAttribute(SESSION_KEY_LOGGED_USER) != null){
             throw new BadRequestException("User is already logged. Please log out.");
         }
@@ -68,30 +68,7 @@ public class UserController {
     }
 
     private boolean hasValidPassword(String password) {
-        int min = 8;
-        int max = 16;
-        int digit = 0;
-        int special = 0;
-        int upCount = 0;
-        int loCount = 0;
-        if(password.length() >= min && password.length() <= max){
-            for(int i = 0; i < password.length(); i++){
-                char c = password.charAt(i);
-                if(Character.isUpperCase(c)){
-                    upCount++;
-                }
-                if(Character.isLowerCase(c)){
-                    loCount++;
-                }
-                if(Character.isDigit(c)){
-                    digit++;
-                }
-                if(c >= 33 && c <= 46 || c==64){
-                    special++;
-                }
-            }
-        }
-        return special >= 1 && loCount >= 1 && upCount >= 1 && digit >= 1;
+        return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@*#$%^&+=])(?=\\S+$).{8,}$");
     }
 
     private void validateUserData(RegisterUserDTO userDto) throws BadRequestException, SQLException {

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
-import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaHallDAO;
 import season11.kino_arena.model.dao.MovieDAO;
 import season11.kino_arena.model.dao.ProjectionDAO;
@@ -32,7 +31,7 @@ public class ProjectionController {
     private TicketDAO ticketDAO;
 
     @PostMapping("/projections/add")
-    public Projection addProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
+    public Projection addProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -54,7 +53,7 @@ public class ProjectionController {
     }
 
     @PutMapping("/projections")
-    public Projection editProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException, NotFoundException, BadRequestException {
+    public Projection editProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -79,7 +78,7 @@ public class ProjectionController {
     }
 
     @DeleteMapping("projections/{id}")
-    public MessageDTO deleteProjection(@PathVariable(name = "id") long id, HttpSession session) throws NotFoundException, SQLException {
+    public MessageDTO deleteProjection(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -90,14 +89,15 @@ public class ProjectionController {
     }
 
     @GetMapping("/projections/{cinemaId}")
-    public ArrayList<Projection> getAllProjectionForCertainCinema(@PathVariable(name = "cinemaId") long cinemaId)
-                                                                                throws SQLException, NotFoundException {
+    public ArrayList<Projection> getAllProjectionForCertainCinema(@PathVariable(name = "cinemaId") long cinemaId) throws SQLException {
         return projectionDAO.getAllProjectionForCertainCinema(cinemaId);
     }
 
     @GetMapping("projections/{cinemaId}/{projectionTypeId}")
-    public ArrayList<Projection> getAllProjectionsByCinemaAndProjectionType(@PathVariable(name = "cinemaId") long cinemaId,
-                                                                            @PathVariable(name = "projectionTypeId") long projectionTypeId) throws NotFoundException, SQLException {
+    public ArrayList<Projection> getAllProjectionsByCinemaAndProjectionType(
+                                                        @PathVariable(name = "cinemaId") long cinemaId,
+                                                        @PathVariable(name = "projectionTypeId") long projectionTypeId)
+                                                                                                    throws SQLException {
         ArrayList<Projection> allProjectionsForCinema = projectionDAO.getAllProjectionForCertainCinema(cinemaId);
         ArrayList<Projection> result = new ArrayList<>();
         for (Projection p :

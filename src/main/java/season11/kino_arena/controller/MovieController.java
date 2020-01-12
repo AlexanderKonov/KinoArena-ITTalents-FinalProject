@@ -30,7 +30,7 @@ public class MovieController {
     private VideoFormatDAO videoFormatDAO;
 
     @PostMapping("/movies/add")
-    public Movie addMovie(@RequestBody MovieDTO reqMovie, HttpSession session) throws SQLException, BadRequestException {
+    public Movie addMovie(@RequestBody MovieDTO reqMovie, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -47,7 +47,7 @@ public class MovieController {
     }
 
     @DeleteMapping("/movies/{id}")
-    public MessageDTO deleteMovie(@PathVariable(name = "id") long id, HttpSession session) throws SQLException, NotFoundException {
+    public MessageDTO deleteMovie(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -57,7 +57,7 @@ public class MovieController {
     }
 
     @PutMapping("/movies")
-    public Movie editMovie(@RequestBody MovieDTO reqMovie, HttpSession session) throws SQLException, BadRequestException {
+    public Movie editMovie(@RequestBody MovieDTO reqMovie, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
@@ -71,7 +71,7 @@ public class MovieController {
     }
 
     @GetMapping("/movies/{id}")
-    public Movie getMoviebyId(@PathVariable(name = "id") long movieId) throws SQLException, NotFoundException {
+    public Movie getMovieById(@PathVariable(name = "id") long movieId) throws SQLException {
         Movie movie = movieDAO.getById(movieId);
         if (movie == null){
             throw new NotFoundException("This movie doesn`t exist");
@@ -79,7 +79,7 @@ public class MovieController {
         return movie;
     }
 
-    private void validateMovieData(MovieDTO movie) throws BadRequestException {
+    private void validateMovieData(MovieDTO movie) {
         if (!runtimeIsValid(movie.getRuntimeInMin())){
             throw new BadRequestException("Movie is too short or too long.");
         }
