@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
-import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.ProjectionDAO;
 import season11.kino_arena.model.dao.TicketDAO;
 import season11.kino_arena.model.dao.UserDAO;

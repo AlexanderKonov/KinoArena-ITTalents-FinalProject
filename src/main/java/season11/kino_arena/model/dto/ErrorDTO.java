@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 
 public class ErrorDTO {
+
     private String msg;
     private int status;
     private LocalDateTime time;

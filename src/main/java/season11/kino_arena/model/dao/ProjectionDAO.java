@@ -21,22 +21,26 @@ public class ProjectionDAO {
     private static final String GET_ALL_PROJECTIONS_FOR_HALL = "SELECT p.id AS id , p.date_time AS date_time , " +
             "m.runtime_in_min AS runtime_in_min FROM projections AS p " +
             "JOIN movies AS m ON p.movie_id = m.id WHERE p.cinema_hall_id = ?";
+
     private static final String ADD_PROJECTION_SQL = "INSERT INTO projections (" +
             "movie_id, " +
             "cinema_hall_id, " +
             "date_time) " +
             "VALUES (?,?,?);";
+
     private static final String EDIT_PROJECTION_SQL = "UPDATE projections " +
                                                         "SET movie_id = ?, " +
                                                         "cinema_hall_id = ?, " +
                                                         "date_time = ? " +
                                                         "WHERE id = ?";
+
     private static final String SELECT_BY_ID = "SELECT " +
                                                 "id, " +
                                                 "movie_id, " +
                                                 "cinema_hall_id, " +
                                                 "date_time " +
                                                 "FROM projections WHERE id = ?";
+
     private static final String GET_ALL_PROJECTIONS_FOR_CINEMA = "SELECT " +
                                                                     "p.id, " +
                                                                     "p.movie_id, " +
@@ -45,10 +49,15 @@ public class ProjectionDAO {
                                                                     "FROM projections AS p " +
                                                                     "JOIN cinema_halls AS ch ON p.cinema_hall_id = ch.id " +
                                                                     "WHERE ch.cinema_id = ?";
+
     private static final String DELETE_PROJECTION_SQL = "DELETE FROM projections WHERE id= ?";
+
     private static final String DELETE_PROJECTION_BY_HALL_ID = "DELETE  FROM projections WHERE cinema_hall_id = ? ";
+
     private static final String DELETE_PROJECTION_BY_MOVIE_ID = "DELETE  FROM projections WHERE movie_id = ? ";
+
     private static final String GET_ALL_PROJECTIONS_IDS_FOR_HALL = "SELECT id FROM projections WHERE cinema_hall_id = ? ";
+
     private static final String GET_ALL_PROJECTIONS_IDS_FOR_MOVIE = "SELECT id FROM projections WHERE movie_id = ? ";
 
     @Autowired

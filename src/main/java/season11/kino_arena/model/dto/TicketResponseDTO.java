@@ -16,5 +16,4 @@ public class TicketResponseDTO {
     private ProjectionForTicketDTO projection;
     private int rowNumber;
     private int seatNumber;
-
 }

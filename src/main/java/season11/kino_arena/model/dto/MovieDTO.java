@@ -27,5 +27,4 @@ public class MovieDTO {
     private long videoFormat;
     private String cast;
     private String director;
-
 }

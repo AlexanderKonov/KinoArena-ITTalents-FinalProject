@@ -16,5 +16,4 @@ public class TicketDTO {
     private long projection;
     private int rowNumber;
     private int seatNumber;
-
 }

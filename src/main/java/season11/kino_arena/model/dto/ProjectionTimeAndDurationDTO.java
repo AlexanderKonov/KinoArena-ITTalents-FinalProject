@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectionTimeAndDurationDTO {
+
     LocalDateTime dateTime;
     int duration;
 }

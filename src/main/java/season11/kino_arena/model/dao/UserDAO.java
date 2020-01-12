@@ -30,9 +30,11 @@ public class UserDAO {
     private static final String SELECT_USER_BY_USERNAME = "SELECT * " +
                                                             "FROM users " +
                                                             "WHERE username = ?;";
+
     private static final String SELECT_USER_BY_EMAIL = "SELECT * " +
                                                             "FROM users " +
                                                             "WHERE email = ?;";
+
     private static final String SELECT_USER_BY_ID = "SELECT * " +
                                                         "FROM users " +
                                                         "WHERE id = ?;";

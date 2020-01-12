@@ -16,21 +16,28 @@ public class TicketDAO {
 
     private static final String GET_ALL_RESERVED_TICKETS_FOR_PROJECTION =
             "SELECT `row_number` , seat_number FROM tickets WHERE projection_id = ?";
+
     private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
+
     private static final String DELETE_ALL_TICKETS_BY_ID = "DELETE FROM tickets WHERE id = ?";
+
     private static final String DELETE_ALL_TICKETS_EXCEEDING_HALL_SIZE =
             "DELETE t FROM tickets AS t " +
                     "JOIN projections AS p ON t.projection_id = p.id " +
                     "WHERE p.cinema_hall_id = ? AND (t.`row_number` > ? OR t.seat_number > ? )";
+
     private static final String SELECT_TICKET_BY_PROJECTION_AND_SEAT =
             "SELECT * FROM tickets WHERE projection_id = ? AND `row_number` = ? AND seat_number = ? ";
+
     private static final String SELECT_TICKET_BY_ID = "SELECT user_id FROM tickets WHERE id = 1";
+
     private static final String ADD_TICKET_SQL = "INSERT INTO tickets " +
             "(user_id, " +
             "projection_id, " +
             "`row_number`, " +
             "seat_number) " +
             "VALUES (?,?,?,?); ";
+
     private static final String SELECT_TICKETS_BY_USER_ID = "SELECT " +
             "id, " +
             "user_id, " +

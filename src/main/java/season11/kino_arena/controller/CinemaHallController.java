@@ -23,6 +23,7 @@ public class CinemaHallController {
 
     public static final int MIN_ROWS_AND_SEATS_IN_HALL = 1;
     public static final int MAX_ROWS_AND_SEATS_IN_HALL = 200;
+
     @Autowired
     CinemaHallDAO cinemaHallDAO;
     @Autowired

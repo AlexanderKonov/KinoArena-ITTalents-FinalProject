@@ -7,7 +7,6 @@ import season11.kino_arena.model.pojo.User;
 
 import java.time.LocalDateTime;
 
-
 @Setter
 @Getter
 @NoArgsConstructor

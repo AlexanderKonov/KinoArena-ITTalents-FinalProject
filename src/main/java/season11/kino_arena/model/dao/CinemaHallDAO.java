@@ -20,6 +20,7 @@ public class CinemaHallDAO {
                                                         "number_of_rows, " +
                                                         "number_of_seats_per_row)" +
                                                         "VALUES (? , ? , ? , ?)";
+
     private static final String EDIT_CINEMA_HALL_SQL ="UPDATE cinema_halls " +
                                                         "SET " +
                                                         "cinema_hall_type_id = ?, " +
@@ -28,15 +29,19 @@ public class CinemaHallDAO {
                                                         "number_of_seats_per_row = ? " +
                                                         "WHERE " +
                                                         "id=?";
+
     private static final String DELETE_CINEMA_HALL_SQL = "DELETE FROM cinema_halls WHERE id= ?;";
+
     private static final String SELECT_BY_ID = "SELECT " +
-            "id, " +
-            "cinema_hall_type_id, " +
-            "cinema_id, " +
-            "number_of_rows, " +
-            "number_of_seats_per_row " +
-            "FROM cinema_halls WHERE id = ?";
+                                                "id, " +
+                                                "cinema_hall_type_id, " +
+                                                "cinema_id, " +
+                                                "number_of_rows, " +
+                                                "number_of_seats_per_row " +
+                                                "FROM cinema_halls WHERE id = ?";
+
     private static final String DELETE_ALL_HALLS_BY_CINEMA_ID = "DELETE FROM cinema_halls WHERE cinema_id = ? ";
+
     private static final String GET_ALL_HALL_IDS_FOR_CINEMA = "SELECT id FROM cinema_halls WHERE cinema_id = ? ";
 
     @Autowired

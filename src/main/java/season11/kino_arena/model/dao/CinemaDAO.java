@@ -14,25 +14,30 @@ import java.util.ArrayList;
 public class CinemaDAO {
 
     private static final String ADD_CINEMA_SQL = "INSERT INTO cinemas (" +
-            "name," +
-            "address," +
-            "telephone_number," +
-            "cinema_info," +
-            "city" +
-            ")" +
-            "VALUES (?,?,?,?,?);";
+                                                    "name," +
+                                                    "address," +
+                                                    "telephone_number," +
+                                                    "cinema_info," +
+                                                    "city" +
+                                                    ")" +
+                                                    "VALUES (?,?,?,?,?);";
+
     private static final String DELETE_CINEMA_SQL = "DELETE FROM cinemas WHERE id= ?;";
+
     private static final String EDIT_CINEMA_SQL ="UPDATE cinemas " +
-            "SET " +
-            "name = ?, " +
-            "address = ?, " +
-            "telephone_number = ?, " +
-            "cinema_info = ?, " +
-            "city = ? " +
-            "WHERE " +
-            "id=?";
+                                                    "SET " +
+                                                    "name = ?, " +
+                                                    "address = ?, " +
+                                                    "telephone_number = ?, " +
+                                                    "cinema_info = ?, " +
+                                                    "city = ? " +
+                                                    "WHERE " +
+                                                    "id=?";
+
     private static final String GET_CINEMA_BY_ID = "SELECT * FROM cinemas WHERE id = ?";
+
     private static final String GET_CINEMA_BY_CITY = "SELECT * FROM cinemas WHERE city = ?";
+
     private static final String GET_ALL_CINEMAS = "SELECT * FROM cinemas ";
 
     @Autowired
