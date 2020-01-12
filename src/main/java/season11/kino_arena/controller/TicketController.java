@@ -9,6 +9,7 @@ import season11.kino_arena.model.dao.TicketDAO;
 import season11.kino_arena.model.dao.UserDAO;
 import season11.kino_arena.model.dto.*;
 import season11.kino_arena.model.pojo.CinemaHall;
+import season11.kino_arena.model.pojo.Projection;
 import season11.kino_arena.model.pojo.User;
 
 import javax.servlet.http.HttpSession;
@@ -36,6 +37,9 @@ public class TicketController {
                 throw new AuthorizationException("You don`t have permissions for that");
             }
         }
+        validateTicketDTO(ticketDTO);
+        ticketDTO.setRowNumber(ticketDTO.getRowNumber()-1);
+        ticketDTO.setSeatNumber(ticketDTO.getSeatNumber()-1);
         if(ticketDAO.tickedIsReserved(ticketDTO)){
             throw new BadRequestException("Ticket is already reserved.");
         }
@@ -43,8 +47,18 @@ public class TicketController {
         return new TicketResponseDTO(ticketDTO.getId(),
                 new UserForTicketDTO(userDAO.getById(ticketDTO.getUser())),
                 new ProjectionForTicketDTO(projectionDAO.getById(ticketDTO.getProjection())),
-                ticketDTO.getRowNumber(),
-                ticketDTO.getSeatNumber());
+                ticketDTO.getRowNumber()+1,
+                ticketDTO.getSeatNumber()+1);
+    }
+
+    private void validateTicketDTO(TicketDTO ticketDTO) throws SQLException {
+        Projection projection = projectionDAO.getById(ticketDTO.getProjection());
+        if (ticketDTO.getRowNumber()<1||ticketDTO.getRowNumber()>projection.getHall().getNumberOfRows()){
+            throw new BadRequestException("Ticket row is invalid.");
+        }
+        if (ticketDTO.getSeatNumber()<1||ticketDTO.getSeatNumber()>projection.getHall().getNumberOfSeatsPerRow()){
+            throw new BadRequestException("Ticket seat is invalid.");
+        }
     }
 
     @GetMapping("/users/{id}/tickets")
@@ -58,7 +72,9 @@ public class TicketController {
                 throw new AuthorizationException("You don`t have permissions for that");
             }
         }
-        return ticketDAO.getAllTicketsForCertainUser(id);
+        ArrayList<TicketResponseDTO> ticketList = ticketDAO.getAllTicketsForCertainUser(id);
+        fixIndexesOfTicketResponseDtoList(ticketList);
+        return ticketList;
     }
 
     @DeleteMapping("/tickets/{id}")
@@ -85,7 +101,9 @@ public class TicketController {
             throw new AuthorizationException();
         }
         ArrayList<TicketWithoutUserDTO> reservedTickets = ticketDAO.getReservedTicketsByProjectionId(projectionID);
-        return getFreeTickets(reservedTickets,projectionID);
+        ArrayList<TicketWithoutUserDTO> ticketList =  getFreeTickets(reservedTickets,projectionID);
+        fixIndexesOfTicketWithoutUserDtoList(ticketList);
+        return ticketList;
     }
 
     @GetMapping("/projection/{projectionID}/tickets/reserved")
@@ -95,7 +113,9 @@ public class TicketController {
         if(user == null){
             throw new AuthorizationException();
         }
-        return ticketDAO.getReservedTicketsByProjectionId(projectionID);
+        ArrayList<TicketWithoutUserDTO> ticketList =  ticketDAO.getReservedTicketsByProjectionId(projectionID);
+        fixIndexesOfTicketWithoutUserDtoList(ticketList);
+        return ticketList;
     }
 
     private ArrayList<TicketWithoutUserDTO> getFreeTickets(ArrayList<TicketWithoutUserDTO> taken , long projectionID) throws SQLException {
@@ -114,5 +134,21 @@ public class TicketController {
             }
         }
         return freeTickets;
+    }
+
+    private void fixIndexesOfTicketWithoutUserDtoList(ArrayList<TicketWithoutUserDTO> ticketList){
+        for (TicketWithoutUserDTO ticket :
+                ticketList) {
+            ticket.setRowNumber(ticket.getRowNumber()+1);
+            ticket.setSeatNumber(ticket.getSeatNumber()+1);
+        }
+    }
+
+    private void fixIndexesOfTicketResponseDtoList(ArrayList<TicketResponseDTO> ticketList) {
+        for (TicketResponseDTO ticket :
+                ticketList) {
+            ticket.setRowNumber(ticket.getRowNumber()+1);
+            ticket.setSeatNumber(ticket.getSeatNumber()+1);
+        }
     }
 }
