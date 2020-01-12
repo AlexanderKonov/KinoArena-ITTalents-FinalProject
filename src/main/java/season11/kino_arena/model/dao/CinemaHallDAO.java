@@ -24,7 +24,6 @@ public class CinemaHallDAO {
     private static final String EDIT_CINEMA_HALL_SQL ="UPDATE cinema_halls " +
                                                         "SET " +
                                                         "cinema_hall_type_id = ?, " +
-                                                        "cinema_id = ?, " +
                                                         "number_of_rows = ?, " +
                                                         "number_of_seats_per_row = ? " +
                                                         "WHERE " +
@@ -73,10 +72,9 @@ public class CinemaHallDAO {
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_HALL_SQL)){
             ps.setLong(1,cinemaHall.getCinemaHallTypeId());
-            ps.setLong(2,cinemaHall.getCinemaId());
-            ps.setInt(3,cinemaHall.getNumberOfRows());
-            ps.setInt(4,cinemaHall.getNumberOfSeatsPerRow());
-            ps.setLong(5,cinemaHall.getId());
+            ps.setInt(2,cinemaHall.getNumberOfRows());
+            ps.setInt(3,cinemaHall.getNumberOfSeatsPerRow());
+            ps.setLong(4,cinemaHall.getId());
             if(ps.executeUpdate()==0){
                 throw new BadRequestException("This cinema hall does not exist.");
             }

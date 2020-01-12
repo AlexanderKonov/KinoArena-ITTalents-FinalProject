@@ -54,12 +54,15 @@ public class CinemaHallController {
         }
         validateCinemaHall(updatedCinemaHall);
         CinemaHall oldHall = cinemaHallDAO.getById(updatedCinemaHall.getId());
+        if (updatedCinemaHall.getCinemaId()!=0){
+            throw new BadRequestException("You are not allowed to set the cinema ID.");
+        }
         cinemaHallDAO.updateCinemaHall(updatedCinemaHall);
         if (updatedCinemaHall.getNumberOfRows()<oldHall.getNumberOfRows()||updatedCinemaHall.getNumberOfSeatsPerRow()<oldHall.getNumberOfSeatsPerRow()){
             ticketDAO.deleteTicketsAfterHallResize(updatedCinemaHall.getNumberOfRows(),updatedCinemaHall.getNumberOfSeatsPerRow(),updatedCinemaHall.getId());
         }
         CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(updatedCinemaHall.getCinemaHallTypeId());
-        Cinema cinema = cinemaDAO.getCinemaById(updatedCinemaHall.getCinemaId());
+        Cinema cinema = oldHall.getCinema();
         return new CinemaHall(updatedCinemaHall,cinemaHallType,cinema);
     }
 
