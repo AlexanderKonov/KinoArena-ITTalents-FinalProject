@@ -10,6 +10,7 @@ import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
 import season11.kino_arena.model.dao.UserDAO;
 import season11.kino_arena.model.dto.LoginUserDTO;
+import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.dto.RegisterUserDTO;
 import season11.kino_arena.model.dto.UserWithoutPasswordDTO;
 import season11.kino_arena.model.pojo.User;
@@ -55,8 +56,9 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public void logout(HttpSession session){
+    public MessageDTO logout(HttpSession session){
         session.invalidate();
+        return new MessageDTO("Logout successful");
     }
 
     private boolean isUsernameTaken(RegisterUserDTO u) throws SQLException {
@@ -71,15 +73,29 @@ public class UserController {
         return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@*#$%^&+=])(?=\\S+$).{8,}$");
     }
 
-    private void validateUserData(RegisterUserDTO userDto) throws BadRequestException, SQLException {
+    private boolean isUsernameCorrect(RegisterUserDTO userDto) {
+        return userDto.getUsername().matches("^[a-zA-Z0-9]+$");
+    }
+
+    private boolean isEmailCorrect(RegisterUserDTO userDto) {
+        return userDto.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$");
+    }
+
+    private void validateUserData(RegisterUserDTO userDto) throws SQLException {
+        if (!isEmailCorrect(userDto)){
+            throw new BadRequestException("Wrong email");
+        }
         if (isEmailTaken(userDto)){
             throw new BadRequestException("This email is taken.");
+        }
+        if (!isUsernameCorrect(userDto)){
+            throw new BadRequestException("Username must contain only characters and numbers.");
         }
         if (isUsernameTaken(userDto)){
             throw new BadRequestException("This username is taken.");
         }
         if(!userDto.getPassword().equals(userDto.getConfirmPassword())){
-            throw new BadRequestException("Both passwords must be the same");
+            throw new BadRequestException("Both passwords must be the same.");
         }
         if (!hasValidPassword(userDto.getPassword())){
             throw new BadRequestException("Password must be between 8 and 16 characters and must contain " +
@@ -89,4 +105,5 @@ public class UserController {
                     "one or more special characters.");
         }
     }
+
 }
