@@ -4,10 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
-import season11.kino_arena.model.dao.CinemaHallDAO;
-import season11.kino_arena.model.dao.MovieDAO;
-import season11.kino_arena.model.dao.ProjectionDAO;
-import season11.kino_arena.model.dao.TicketDAO;
+import season11.kino_arena.exceptions.NotFoundException;
+import season11.kino_arena.model.dao.*;
 import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.dto.ProjectionDTO;
 import season11.kino_arena.model.dto.ProjectionTimeAndDurationDTO;
@@ -29,13 +27,17 @@ public class ProjectionController {
     private CinemaHallDAO cinemaHallDAO;
     @Autowired
     private TicketDAO ticketDAO;
-
+    @Autowired
+    private CinemaDAO cinemaDAO;
+    @Autowired
+    private VideoFormatDAO videoFormatDAO;
     @PostMapping("/projections/add")
     public Projection addProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
+        validateProjectionDto(reqProjection);
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall =
                 projectionDAO.getAllProjectionsForHall(reqProjection.getHall(),reqProjection.getId());
         allProjectionsForTheChosenHall.sort((p1,p2)->p1.getDateTime().compareTo(p2.getDateTime()));
@@ -52,6 +54,18 @@ public class ProjectionController {
         }
     }
 
+    private void validateProjectionDto(ProjectionDTO reqProjection) throws SQLException {
+        if (movieDAO.getById(reqProjection.getMovie()) == null){
+            throw new BadRequestException("Movie doesn't exist!");
+        }
+        if (cinemaHallDAO.getById(reqProjection.getHall()) == null){
+            throw new BadRequestException("Cinema hall doesn't exist.");
+        }
+        if (reqProjection.getDateTime()==null){
+            throw new BadRequestException("DateTime is incorrect.");
+        }
+    }
+
     @PutMapping("/projections")
     public Projection editProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
@@ -61,6 +75,7 @@ public class ProjectionController {
         if (reqProjection.getId()==0){
             throw new BadRequestException("Projection ID is missing.");
         }
+        validateProjectionDto(reqProjection);
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall =
                 projectionDAO.getAllProjectionsForHall(reqProjection.getHall(),reqProjection.getId());
         allProjectionsForTheChosenHall.sort((p1,p2)->p1.getDateTime().compareTo(p2.getDateTime()));
@@ -90,6 +105,7 @@ public class ProjectionController {
 
     @GetMapping("/projections/{cinemaId}")
     public ArrayList<Projection> getAllProjectionForCertainCinema(@PathVariable(name = "cinemaId") long cinemaId) throws SQLException {
+        cinemaDAO.getCinemaById(cinemaId);
         return projectionDAO.getAllProjectionForCertainCinema(cinemaId);
     }
 
@@ -98,6 +114,10 @@ public class ProjectionController {
                                                         @PathVariable(name = "cinemaId") long cinemaId,
                                                         @PathVariable(name = "projectionTypeId") long projectionTypeId)
                                                                                                     throws SQLException {
+        cinemaDAO.getCinemaById(cinemaId);
+        if (videoFormatDAO.getById(projectionTypeId) == null) {
+            throw new NotFoundException("Projection type not found.");
+        }
         ArrayList<Projection> allProjectionsForCinema = projectionDAO.getAllProjectionForCertainCinema(cinemaId);
         ArrayList<Projection> result = new ArrayList<>();
         for (Projection p :

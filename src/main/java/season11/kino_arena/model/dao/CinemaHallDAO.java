@@ -121,7 +121,7 @@ public class CinemaHallDAO {
         return hallIds;
     }
 
-    public CinemaHall getById(long id) throws SQLException, NotFoundException {
+    public CinemaHall getById(long id) throws SQLException {
         try(
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(SELECT_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
