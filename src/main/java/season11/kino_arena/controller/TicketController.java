@@ -28,7 +28,7 @@ public class TicketController {
 
     @PostMapping("/tickets/add")
     public TicketResponseDTO addTicket(@RequestBody TicketDTO ticketDTO, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
         }
@@ -70,7 +70,7 @@ public class TicketController {
 
     @GetMapping("/users/{id}/tickets")
     public ArrayList<TicketResponseDTO> getAllTicketsForCertainUser(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("You don`t have permissions for that");
         }
@@ -86,7 +86,7 @@ public class TicketController {
 
     @DeleteMapping("/tickets/{id}")
     public MessageDTO deleteTicket(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("You don`t have permissions for that");
         }
@@ -103,7 +103,7 @@ public class TicketController {
     @GetMapping("/projection/{projectionID}/tickets/free")
     public ArrayList<TicketWithoutUserDTO> getFreeTicketsForProjection(
             @PathVariable(name = "projectionID") long projectionID, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
         }
@@ -116,7 +116,7 @@ public class TicketController {
     @GetMapping("/projection/{projectionID}/tickets/reserved")
     public ArrayList<TicketWithoutUserDTO> getReservedTickets(
             @PathVariable(name = "projectionID") long projectionID, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
         }

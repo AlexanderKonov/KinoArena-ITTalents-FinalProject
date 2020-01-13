@@ -63,21 +63,21 @@ public class MovieDAO {
         try (
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(ADD_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, movie.getName());
-            ps.setString(2, movie.getDescription());
-            ps.setInt(3, movie.getRuntimeInMin());
-            ps.setDate(4, movie.getPremiere());
-            ps.setLong(5, movie.getGenre());
-            ps.setLong(6, movie.getRestriction());
-            ps.setDouble(7, movie.getRating());
-            ps.setBoolean(8, movie.getIsDubbed());
-            ps.setLong(9, movie.getVideoFormat());
-            ps.setString(10, movie.getCast());
-            ps.setString(11, movie.getDirector());
-            ps.executeUpdate();
-            ResultSet keys = ps.getGeneratedKeys();
-            keys.next();
-            movie.setId(keys.getLong(1));
+                ps.setString(1, movie.getName());
+                ps.setString(2, movie.getDescription());
+                ps.setInt(3, movie.getRuntimeInMin());
+                ps.setDate(4, movie.getPremiere());
+                ps.setLong(5, movie.getGenre());
+                ps.setLong(6, movie.getRestriction());
+                ps.setDouble(7, movie.getRating());
+                ps.setBoolean(8, movie.getIsDubbed());
+                ps.setLong(9, movie.getVideoFormat());
+                ps.setString(10, movie.getCast());
+                ps.setString(11, movie.getDirector());
+                ps.executeUpdate();
+                ResultSet keys = ps.getGeneratedKeys();
+                keys.next();
+                movie.setId(keys.getLong(1));
         }
     }
 

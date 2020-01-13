@@ -32,7 +32,7 @@ public class ProjectionController {
 
     @PostMapping("/projections/add")
     public Projection addProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
@@ -54,7 +54,7 @@ public class ProjectionController {
 
     @PutMapping("/projections")
     public Projection editProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
@@ -79,7 +79,7 @@ public class ProjectionController {
 
     @DeleteMapping("projections/{id}")
     public MessageDTO deleteProjection(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }

@@ -21,7 +21,7 @@ import java.sql.SQLException;
 @RestController
 public class UserController {
 
-    public static final String SESSION_KEY_LOGGED_USER = "logged_user";
+    public static final String LOGGED_USER = "logged_user";
 
     @Autowired
     private UserDAO userDao;
@@ -33,13 +33,13 @@ public class UserController {
         User user = new User(userDto);
         user.setPassword(encoder.encode(userDto.getPassword()));
         userDao.addUser(user);
-        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
+        session.setAttribute(LOGGED_USER, user);
         return new UserWithoutPasswordDTO(userDao.getById(user.getId()));
     }
 
     @PostMapping("/login")
     public UserWithoutPasswordDTO login(@RequestBody LoginUserDTO loginUserDTO, HttpSession session) throws SQLException {
-        if (session.getAttribute(SESSION_KEY_LOGGED_USER) != null){
+        if (session.getAttribute(LOGGED_USER) != null){
             throw new BadRequestException("User is already logged. Please log out.");
         }
         User user = userDao.getByUsername(loginUserDTO.getUsername());
@@ -47,7 +47,7 @@ public class UserController {
             throw new AuthorizationException("Invalid credentials");
         }
         if(BCrypt.checkpw(loginUserDTO.getPassword(), user.getPassword())) {
-            session.setAttribute(SESSION_KEY_LOGGED_USER, user);
+            session.setAttribute(LOGGED_USER, user);
             return new UserWithoutPasswordDTO(user);
         }
         else{

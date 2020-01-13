@@ -31,13 +31,19 @@ public class MovieController {
 
     @PostMapping("/movies/add")
     public Movie addMovie(@RequestBody MovieDTO reqMovie, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
         validateMovieData(reqMovie);
         if (movieDAO.movieExists(reqMovie)){
             throw new BadRequestException("Movie already exists.");
+        }
+        if(genreDAO.getById(reqMovie.getGenre()) == null){
+            throw new BadRequestException("There is no genre like this.");
+        }
+        if(restrictionDAO.getById(reqMovie.getRestriction()) == null){
+            throw new BadRequestException("There is no restriction like this.");
         }
         movieDAO.addMovie(reqMovie);
         return new Movie(reqMovie,
@@ -48,7 +54,7 @@ public class MovieController {
 
     @DeleteMapping("/movies/{id}")
     public MessageDTO deleteMovie(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
@@ -58,7 +64,7 @@ public class MovieController {
 
     @PutMapping("/movies")
     public Movie editMovie(@RequestBody MovieDTO reqMovie, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
@@ -78,6 +84,8 @@ public class MovieController {
         }
         return movie;
     }
+
+    //TODO show all movies
 
     private void validateMovieData(MovieDTO movie) {
         if (!runtimeIsValid(movie.getRuntimeInMin())){

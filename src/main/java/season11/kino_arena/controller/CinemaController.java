@@ -21,7 +21,7 @@ public class CinemaController {
 
     @PostMapping("/cinemas/add")
     public Cinema addCinema(@RequestBody Cinema cinema, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
@@ -32,7 +32,7 @@ public class CinemaController {
 
     @PutMapping("cinemas")
     public Cinema editCinema(@RequestBody Cinema cinema, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
@@ -43,7 +43,7 @@ public class CinemaController {
 
     @DeleteMapping("cinemas/{id}")
     public MessageDTO deleteCinema(@PathVariable(name = "id") long id, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(UserController.SESSION_KEY_LOGGED_USER);
+        User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
