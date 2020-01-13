@@ -11,8 +11,7 @@ import season11.kino_arena.model.dao.RestrictionDAO;
 import season11.kino_arena.model.dao.VideoFormatDAO;
 import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.dto.MovieDTO;
-import season11.kino_arena.model.pojo.Movie;
-import season11.kino_arena.model.pojo.User;
+import season11.kino_arena.model.pojo.*;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
@@ -39,17 +38,20 @@ public class MovieController {
         if (movieDAO.movieExists(reqMovie)){
             throw new BadRequestException("Movie already exists.");
         }
-        if(genreDAO.getById(reqMovie.getGenre()) == null){
+        Genre genre = genreDAO.getById(reqMovie.getGenre());
+        if(genre == null){
             throw new BadRequestException("There is no genre like this.");
         }
-        if(restrictionDAO.getById(reqMovie.getRestriction()) == null){
+        Restriction restriction = restrictionDAO.getById(reqMovie.getRestriction());
+        if(restriction == null){
             throw new BadRequestException("There is no restriction like this.");
         }
+        VideoFormat videoFormat = videoFormatDAO.getById(reqMovie.getVideoFormat());
+        if (videoFormat==null){
+            throw new NotFoundException("Video format was not found.");
+        }
         movieDAO.addMovie(reqMovie);
-        return new Movie(reqMovie,
-                genreDAO.getById(reqMovie.getGenre()),
-                restrictionDAO.getById(reqMovie.getRestriction()),
-                videoFormatDAO.getById(reqMovie.getVideoFormat()));
+        return new Movie(reqMovie, genre, restriction, videoFormat);
     }
 
     @DeleteMapping("/movies/{id}")
@@ -57,6 +59,9 @@ public class MovieController {
         User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
+        }
+        if (movieDAO.getById(id)==null){
+            throw new NotFoundException("Movie was not found.");
         }
         movieDAO.deleteMovie(id);
         return new MessageDTO("Movie deleted successfully!");
@@ -69,11 +74,23 @@ public class MovieController {
             throw new AuthorizationException("You don`t have permissions for that");
         }
         validateMovieData(reqMovie);
+        if (movieDAO.getById(reqMovie.getId())==null){
+            throw new NotFoundException("Movie was not found.");
+        }
+        Genre genre = genreDAO.getById(reqMovie.getGenre());
+        if(genre == null){
+            throw new BadRequestException("There is no genre like this.");
+        }
+        Restriction restriction = restrictionDAO.getById(reqMovie.getRestriction());
+        if(restriction == null){
+            throw new BadRequestException("There is no restriction like this.");
+        }
+        VideoFormat videoFormat = videoFormatDAO.getById(reqMovie.getVideoFormat());
+        if (videoFormat==null){
+            throw new NotFoundException("Video format was not found.");
+        }
         movieDAO.editMovie(reqMovie);
-        return new Movie(reqMovie,
-                genreDAO.getById(reqMovie.getGenre()),
-                restrictionDAO.getById(reqMovie.getRestriction()),
-                videoFormatDAO.getById(reqMovie.getVideoFormat()));
+        return new Movie(reqMovie, genre, restriction, videoFormat);
     }
 
     @GetMapping("/movies/{id}")

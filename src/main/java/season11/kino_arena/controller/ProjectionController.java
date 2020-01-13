@@ -76,6 +76,9 @@ public class ProjectionController {
             throw new BadRequestException("Projection ID is missing.");
         }
         validateProjectionDto(reqProjection);
+        if (projectionDAO.getById(reqProjection.getId())==null){
+            throw new NotFoundException("Projection not found.");
+        }
         ArrayList<ProjectionTimeAndDurationDTO> allProjectionsForTheChosenHall =
                 projectionDAO.getAllProjectionsForHall(reqProjection.getHall(),reqProjection.getId());
         allProjectionsForTheChosenHall.sort((p1,p2)->p1.getDateTime().compareTo(p2.getDateTime()));
@@ -98,14 +101,18 @@ public class ProjectionController {
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
-        //ticketDAO.deleteTicketsByProjectionId(id);
+        if (projectionDAO.getById(id)==null){
+            throw new NotFoundException("Projection was not found.");
+        }
         projectionDAO.deleteProjection(id);
         return new MessageDTO("Projection deleted successfully.");
     }
 
     @GetMapping("/projections/{cinemaId}")
     public ArrayList<Projection> getAllProjectionForCertainCinema(@PathVariable(name = "cinemaId") long cinemaId) throws SQLException {
-        cinemaDAO.getCinemaById(cinemaId);
+        if (cinemaDAO.getCinemaById(cinemaId)==null){
+            throw new NotFoundException("Cinema was not found.");
+        }
         return projectionDAO.getAllProjectionForCertainCinema(cinemaId);
     }
 
@@ -114,7 +121,9 @@ public class ProjectionController {
                                                         @PathVariable(name = "cinemaId") long cinemaId,
                                                         @PathVariable(name = "projectionTypeId") long projectionTypeId)
                                                                                                     throws SQLException {
-        cinemaDAO.getCinemaById(cinemaId);
+        if (cinemaDAO.getCinemaById(cinemaId)==null){
+            throw new NotFoundException("Cinema was not found.");
+        }
         if (videoFormatDAO.getById(projectionTypeId) == null) {
             throw new NotFoundException("Projection type not found.");
         }

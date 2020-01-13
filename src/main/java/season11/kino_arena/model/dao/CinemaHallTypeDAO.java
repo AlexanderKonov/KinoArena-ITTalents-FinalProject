@@ -27,7 +27,7 @@ public class CinemaHallTypeDAO {
                 return new CinemaHallType(rs.getLong("id"),
                         rs.getString("name"));
             } else {
-                throw new NotFoundException("Cinema hall type was not found");
+                return null;
             }
         }
     }

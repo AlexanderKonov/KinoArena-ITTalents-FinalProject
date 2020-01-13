@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
+import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaDAO;
 import season11.kino_arena.model.dao.CinemaHallDAO;
 import season11.kino_arena.model.dao.CinemaHallTypeDAO;
@@ -40,9 +41,15 @@ public class CinemaHallController {
             throw new AuthorizationException("You don`t have permissions for that");
         }
         validateCinemaHall(cinemaHallWithIndexes);
-        cinemaHallDAO.addCinemaHall(cinemaHallWithIndexes);
         CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(cinemaHallWithIndexes.getCinemaHallTypeId());
         Cinema cinema = cinemaDAO.getCinemaById(cinemaHallWithIndexes.getCinemaId());
+        if (cinemaHallType == null){
+            throw new NotFoundException("Cinema hall type was not found.");
+        }
+        if (cinema == null){
+            throw new NotFoundException("Cinema was not found.");
+        }
+        cinemaHallDAO.addCinemaHall(cinemaHallWithIndexes);
         return new CinemaHall(cinemaHallWithIndexes,cinemaHallType,cinema);
     }
 
@@ -54,6 +61,13 @@ public class CinemaHallController {
         }
         validateCinemaHall(updatedCinemaHall);
         CinemaHall oldHall = cinemaHallDAO.getById(updatedCinemaHall.getId());
+        if (oldHall==null){
+            throw new NotFoundException("Cinema hall was not found.");
+        }
+        CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(updatedCinemaHall.getCinemaHallTypeId());
+        if (cinemaHallType==null){
+            throw new NotFoundException("Cinema hall type was not found.");
+        }
         if (updatedCinemaHall.getCinemaId()!=0){
             throw new BadRequestException("You are not allowed to set the cinema ID.");
         }
@@ -61,7 +75,6 @@ public class CinemaHallController {
         if (updatedCinemaHall.getNumberOfRows()<oldHall.getNumberOfRows()||updatedCinemaHall.getNumberOfSeatsPerRow()<oldHall.getNumberOfSeatsPerRow()){
             ticketDAO.deleteTicketsAfterHallResize(updatedCinemaHall.getNumberOfRows(),updatedCinemaHall.getNumberOfSeatsPerRow(),updatedCinemaHall.getId());
         }
-        CinemaHallType cinemaHallType = cinemaHallTypeDAO.getCinemaHallTypeById(updatedCinemaHall.getCinemaHallTypeId());
         Cinema cinema = oldHall.getCinema();
         return new CinemaHall(updatedCinemaHall,cinemaHallType,cinema);
     }
@@ -71,6 +84,9 @@ public class CinemaHallController {
         User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
+        }
+        if (cinemaHallDAO.getById(id)==null){
+            throw new NotFoundException("Cinema hall was not found.");
         }
         cinemaHallDAO.deleteCinemaHall(id);
         return new MessageDTO("Cinema hall deleted successfully.");

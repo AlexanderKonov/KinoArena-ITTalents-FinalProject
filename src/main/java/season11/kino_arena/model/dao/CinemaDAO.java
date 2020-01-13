@@ -60,18 +60,16 @@ public class CinemaDAO {
         }
     }
 
-    public void deleteCinema(long cinemaID) throws SQLException, NotFoundException {
+    public void deleteCinema(long cinemaID) throws SQLException {
         cinemaHallDAO.deleteCinemaHallsByCinemaId(cinemaID);
         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_SQL)){
             ps.setLong(1,cinemaID);
-            if (ps.executeUpdate()==0) {
-                throw new NotFoundException("Cinema was not found.");
-            }
+            ps.executeUpdate();
         }
     }
 
-    public void updateCinema(Cinema cinema) throws SQLException, BadRequestException {
+    public void updateCinema(Cinema cinema) throws SQLException {
 
         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_SQL)){
@@ -81,13 +79,11 @@ public class CinemaDAO {
             ps.setString(4,cinema.getCinemaInfo());
             ps.setString(5,cinema.getCity());
             ps.setLong(6,cinema.getId());
-            if(ps.executeUpdate()==0){
-                throw new BadRequestException("Cinema was not found.");
-            }
+            ps.executeUpdate();
         }
     }
 
-    public Cinema getCinemaById(long id) throws SQLException, NotFoundException {
+    public Cinema getCinemaById(long id) throws SQLException {
         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = connection.prepareStatement(GET_CINEMA_BY_ID, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
@@ -101,7 +97,7 @@ public class CinemaDAO {
                         rs.getString("city"));
             }
             else{
-                throw new NotFoundException("Cinema not found");
+                return null;
             }
         }
     }

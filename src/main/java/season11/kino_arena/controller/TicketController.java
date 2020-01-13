@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
+import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.ProjectionDAO;
 import season11.kino_arena.model.dao.TicketDAO;
 import season11.kino_arena.model.dao.UserDAO;
@@ -79,6 +80,9 @@ public class TicketController {
                 throw new AuthorizationException("You don`t have permissions for that");
             }
         }
+        if (userDAO.getById(id)==null){
+            throw new NotFoundException("User not found.");
+        }
         ArrayList<TicketResponseDTO> ticketList = ticketDAO.getAllTicketsForCertainUser(id);
         fixIndexesOfTicketResponseDtoList(ticketList);
         return ticketList;
@@ -92,9 +96,15 @@ public class TicketController {
         }
         if(!user.getIsAdmin()){
             long ticketUserId = ticketDAO.getUserIdByTicketId(id);
+            if (ticketUserId == -1){
+                throw new NotFoundException("Ticket not found.");
+            }
             if(user.getId() != ticketUserId){
                 throw new AuthorizationException("You don`t have permissions for that");
             }
+        }
+        if (!ticketDAO.ticketExists(id)){
+            throw new NotFoundException("Ticket was not found.");
         }
         ticketDAO.deleteTicketById(id);
         return new MessageDTO("Ticket was deleted successfully.");
@@ -106,6 +116,9 @@ public class TicketController {
         User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
+        }
+        if (projectionDAO.getById(projectionID)==null){
+            throw new NotFoundException("Projection not found.");
         }
         ArrayList<TicketWithoutUserDTO> reservedTickets = ticketDAO.getReservedTicketsByProjectionId(projectionID);
         ArrayList<TicketWithoutUserDTO> ticketList =  getFreeTickets(reservedTickets,projectionID);
@@ -119,6 +132,9 @@ public class TicketController {
         User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null){
             throw new AuthorizationException();
+        }
+        if (projectionDAO.getById(projectionID)==null){
+            throw new NotFoundException("Projection not found.");
         }
         ArrayList<TicketWithoutUserDTO> ticketList =  ticketDAO.getReservedTicketsByProjectionId(projectionID);
         fixIndexesOfTicketWithoutUserDtoList(ticketList);

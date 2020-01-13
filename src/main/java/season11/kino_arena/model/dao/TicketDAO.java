@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dto.*;
 import season11.kino_arena.model.dto.TicketDTO;
+import season11.kino_arena.model.pojo.Ticket;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class TicketDAO {
     private static final String SELECT_TICKET_BY_PROJECTION_AND_SEAT =
                              "SELECT * FROM tickets WHERE projection_id = ? AND `row_number` = ? AND seat_number = ? ";
 
-    private static final String SELECT_TICKET_BY_ID = "SELECT user_id FROM tickets WHERE id = ?";
+    private static final String SELECT_USER_ID_FROM_TICKETS_WHERE_ID = "SELECT user_id FROM tickets WHERE id = ?";
 
     private static final String ADD_TICKET_SQL = "INSERT INTO tickets " +
                                                 "(user_id, " +
@@ -44,6 +45,8 @@ public class TicketDAO {
                                                             "`row_number`, " +
                                                             "seat_number " +
                                                             "FROM tickets WHERE user_id = ?";
+    private static final String SELECT_TICKET_BY_ID = "SELECT * FROM tickets WHERE id = ? ";
+    private static final long NOT_EXISTING_USER_ID = -1;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -144,15 +147,25 @@ public class TicketDAO {
 
     public long getUserIdByTicketId(long id) throws SQLException {
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement ps = connection.prepareStatement(SELECT_TICKET_BY_ID)) {
+             PreparedStatement ps = connection.prepareStatement(SELECT_USER_ID_FROM_TICKETS_WHERE_ID)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()){
                 return rs.getLong("user_id");
             }
             else {
-                throw new NotFoundException("Ticket was not found.");
+                return NOT_EXISTING_USER_ID;
             }
+        }
+    }
+
+    public boolean ticketExists(long id) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(SELECT_TICKET_BY_ID)) {
+            ps.setLong(1, id);
+
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
         }
     }
 }

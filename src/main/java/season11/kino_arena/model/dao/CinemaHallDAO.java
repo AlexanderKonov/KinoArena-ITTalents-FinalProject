@@ -67,7 +67,7 @@ public class CinemaHallDAO {
         }
     }
 
-    public void updateCinemaHall(CinemaHallDTO cinemaHall) throws SQLException, BadRequestException {
+    public void updateCinemaHall(CinemaHallDTO cinemaHall) throws SQLException {
         try(
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(EDIT_CINEMA_HALL_SQL)){
@@ -75,9 +75,7 @@ public class CinemaHallDAO {
             ps.setInt(2,cinemaHall.getNumberOfRows());
             ps.setInt(3,cinemaHall.getNumberOfSeatsPerRow());
             ps.setLong(4,cinemaHall.getId());
-            if(ps.executeUpdate()==0){
-                throw new BadRequestException("This cinema hall does not exist.");
-            }
+            ps.executeUpdate();
         }
     }
 
@@ -87,9 +85,7 @@ public class CinemaHallDAO {
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_HALL_SQL)){
             ps.setLong(1,id);
-            if (ps.executeUpdate()==0) {
-                throw new NotFoundException("Cinema hall was not found.");
-            }
+            ps.executeUpdate();
         }
     }
 

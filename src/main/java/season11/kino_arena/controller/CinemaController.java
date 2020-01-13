@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import season11.kino_arena.exceptions.AuthorizationException;
 import season11.kino_arena.exceptions.BadRequestException;
+import season11.kino_arena.exceptions.NotFoundException;
 import season11.kino_arena.model.dao.CinemaDAO;
 import season11.kino_arena.model.dto.MessageDTO;
 import season11.kino_arena.model.pojo.Cinema;
@@ -36,6 +37,9 @@ public class CinemaController {
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
         }
+        if (cinemaDAO.getCinemaById(cinema.getId())==null){
+            throw new NotFoundException("Cinema was not found.");
+        }
         validateCinemaData(cinema);//throws exception
         cinemaDAO.updateCinema(cinema);
         return cinema;
@@ -46,6 +50,9 @@ public class CinemaController {
         User user = (User) session.getAttribute(UserController.LOGGED_USER);
         if(user == null || !user.getIsAdmin()){
             throw new AuthorizationException("You don`t have permissions for that");
+        }
+        if (cinemaDAO.getCinemaById(id)==null){
+            throw new NotFoundException("Cinema was not found.");
         }
         cinemaDAO.deleteCinema(id);
         return new MessageDTO("Cinema deleted successfully.");

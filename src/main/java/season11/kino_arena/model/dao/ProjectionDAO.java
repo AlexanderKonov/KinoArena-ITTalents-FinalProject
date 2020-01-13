@@ -91,9 +91,7 @@ public class ProjectionDAO {
             ps.setLong(2, projection.getHall());
             ps.setTimestamp(3, Timestamp.valueOf(projection.getDateTime()));
             ps.setLong(4, projection.getId());
-            if(ps.executeUpdate() == 0){
-                throw new BadRequestException("Projection with this id doesn`t exist");
-            }
+            ps.executeUpdate();
         }
     }
 
@@ -137,9 +135,7 @@ public class ProjectionDAO {
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(DELETE_PROJECTION_SQL)){
             ps.setLong(1,projectionId);
-            if (ps.executeUpdate()==0) {
-                throw new NotFoundException("Projection was not found.");
-            }
+            ps.executeUpdate();
         }
     }
 

@@ -87,9 +87,7 @@ public class MovieDAO {
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(DELETE_MOVIE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, id);
-            if(ps.executeUpdate() == 0){
-                throw new NotFoundException("Movie was not found.");
-            }
+            ps.executeUpdate();
         }
     }
 
@@ -109,9 +107,7 @@ public class MovieDAO {
             ps.setString(10, movie.getCast());
             ps.setString(11, movie.getDirector());
             ps.setLong(12, movie.getId());
-            if(ps.executeUpdate() == 0){
-                throw new BadRequestException("Movies with this id doesn`t exist");
-            }
+            ps.executeUpdate();
         }
     }
 
