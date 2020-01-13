@@ -63,7 +63,7 @@ public class CinemaController {
 
     private void validateCinemaData(Cinema cinema) throws BadRequestException {
         if (!isValidPhone(cinema.getTelephoneNumber())){
-            throw new BadRequestException("Telephone number is ot valid.");
+            throw new BadRequestException("Telephone number is not valid.");
         }
         if (!isValidCity(cinema.getCity())){
             throw new BadRequestException("City is not valid.");

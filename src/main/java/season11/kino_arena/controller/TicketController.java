@@ -53,6 +53,13 @@ public class TicketController {
 
     private void validateTicketDTO(TicketDTO ticketDTO) throws SQLException {
         Projection projection = projectionDAO.getById(ticketDTO.getProjection());
+        User user = userDAO.getById(ticketDTO.getUser());
+        if(user == null){
+            throw new BadRequestException("Invalid user.");
+        }
+        if(projection == null){
+            throw new BadRequestException("Invalid projection.");
+        }
         if (ticketDTO.getRowNumber()<1||ticketDTO.getRowNumber()>projection.getHall().getNumberOfRows()){
             throw new BadRequestException("Ticket row is invalid.");
         }
