@@ -15,6 +15,7 @@ import season11.kino_arena.model.pojo.*;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 @RestController
 public class MovieController {
@@ -103,6 +104,10 @@ public class MovieController {
     }
 
     //TODO show all movies
+    @GetMapping("/movies")
+    public ArrayList<Movie> getAllMovies() throws SQLException {
+        return movieDAO.getAllMovies();
+    }
 
     private void validateMovieData(MovieDTO movie) {
         if (!runtimeIsValid(movie.getRuntimeInMin())){

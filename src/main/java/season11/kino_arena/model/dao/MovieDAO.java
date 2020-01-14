@@ -9,6 +9,7 @@ import season11.kino_arena.model.dto.MovieDTO;
 import season11.kino_arena.model.pojo.Movie;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 @Component
 public class MovieDAO {
@@ -47,6 +48,7 @@ public class MovieDAO {
     private static final String SELECT_BY_ID = "SELECT * FROM movies WHERE id = ?";
 
     private static final String SELECT_BY_MULTIPLE_FIELDS = "SELECT * FROM movies WHERE name= ? AND premiere = ? ";
+    private static final String SELECT_ALL_MOVIES = "SELECT * FROM movies ";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -148,5 +150,36 @@ public class MovieDAO {
                 return null;
             }
         }
+    }
+
+    public ArrayList<Movie> getAllMovies() throws SQLException {
+        ArrayList<MovieDTO> allMoviesDto = new ArrayList<>();
+        ArrayList<Movie> allMovies = new ArrayList<>();
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = connection.prepareStatement(SELECT_ALL_MOVIES)){
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                allMoviesDto.add(new MovieDTO(rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("runtime_in_min"),
+                        rs.getDate("premiere"),
+                        rs.getLong("genre_id"),
+                        rs.getLong("restriction_id"),
+                        rs.getDouble("rating"),
+                        rs.getBoolean("is_dubbed"),
+                        rs.getLong("video_fomat_id"),
+                        rs.getString("cast"),
+                        rs.getString("directors")));
+            }
+        }
+        for (MovieDTO movieDTO :
+                allMoviesDto) {
+            allMovies.add(new Movie(movieDTO,
+                    genreDAO.getById(movieDTO.getGenre()),
+                    restrictionDAO.getById(movieDTO.getRestriction()),
+                    videoFormatDAO.getById(movieDTO.getVideoFormat())));
+        }
+        return allMovies;
     }
 }
