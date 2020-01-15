@@ -61,7 +61,6 @@ public class CinemaDAO {
     }
 
     public void deleteCinema(long cinemaID) throws SQLException {
-        cinemaHallDAO.deleteCinemaHallsByCinemaId(cinemaID);
         try(Connection connection = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_SQL)){
             ps.setLong(1,cinemaID);

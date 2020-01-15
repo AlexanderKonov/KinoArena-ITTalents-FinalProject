@@ -17,8 +17,6 @@ public class TicketDAO {
     private static final String GET_ALL_RESERVED_TICKETS_FOR_PROJECTION =
                                           "SELECT `row_number` , seat_number FROM tickets WHERE projection_id = ?";
 
-    private static final String DELETE_ALL_TICKETS_BY_PROJECTION_ID = "DELETE FROM tickets WHERE projection_id = ?";
-
     private static final String DELETE_TICKET_BY_ID = "DELETE FROM tickets WHERE id = ?";
 
     private static final String DELETE_ALL_TICKETS_EXCEEDING_HALL_SIZE =
@@ -92,14 +90,6 @@ public class TicketDAO {
             }
         }
         return tickets;
-    }
-
-    public void deleteTicketsByProjectionId(long projectionId) throws SQLException {
-        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
-            PreparedStatement ps = connection.prepareStatement(DELETE_ALL_TICKETS_BY_PROJECTION_ID)){
-            ps.setLong(1,projectionId);
-            ps.executeUpdate();
-        }
     }
 
     public void deleteTicketById(long id) throws SQLException {

@@ -39,9 +39,6 @@ public class CinemaHallDAO {
                                                 "number_of_seats_per_row " +
                                                 "FROM cinema_halls WHERE id = ?";
 
-    private static final String DELETE_ALL_HALLS_BY_CINEMA_ID = "DELETE FROM cinema_halls WHERE cinema_id = ? ";
-
-    private static final String GET_ALL_HALL_IDS_FOR_CINEMA = "SELECT id FROM cinema_halls WHERE cinema_id = ? ";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -80,41 +77,12 @@ public class CinemaHallDAO {
     }
 
     public void deleteCinemaHall(long id) throws SQLException, NotFoundException {
-        projectionDAO.deleteProjectionsByHallId(id);
         try(
                 Connection connection = jdbcTemplate.getDataSource().getConnection();
                 PreparedStatement ps = connection.prepareStatement(DELETE_CINEMA_HALL_SQL)){
             ps.setLong(1,id);
             ps.executeUpdate();
         }
-    }
-
-    public void deleteCinemaHallsByCinemaId(long cinemaId) throws SQLException {
-        ArrayList<Long> cinemaIdList = getAllCinemaHallIdsForCinema(cinemaId);
-        for (long id :
-                cinemaIdList) {
-            projectionDAO.deleteProjectionsByHallId(id);
-        }
-        try(
-                Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement ps = connection.prepareStatement(DELETE_ALL_HALLS_BY_CINEMA_ID)){
-            ps.setLong(1,cinemaId);
-            ps.executeUpdate();
-        }
-    }
-
-    private ArrayList<Long> getAllCinemaHallIdsForCinema(long cinemaId) throws SQLException {
-        ArrayList<Long> hallIds = new ArrayList<>();
-        try(
-                Connection connection = jdbcTemplate.getDataSource().getConnection();
-                PreparedStatement ps = connection.prepareStatement(GET_ALL_HALL_IDS_FOR_CINEMA)){
-            ps.setLong(1, cinemaId);
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-                hallIds.add(rs.getLong("id"));
-            }
-        }
-        return hallIds;
     }
 
     public CinemaHall getById(long id) throws SQLException {
