@@ -61,10 +61,10 @@ public class TicketController {
         if(projection == null){
             throw new BadRequestException("Invalid projection.");
         }
-        if (ticketDTO.getRowNumber()<1||ticketDTO.getRowNumber()>projection.getHall().getNumberOfRows()){
+        if (ticketDTO.getRowNumber() < 1 || ticketDTO.getRowNumber() > projection.getHall().getNumberOfRows()){
             throw new BadRequestException("Ticket row is invalid.");
         }
-        if (ticketDTO.getSeatNumber()<1||ticketDTO.getSeatNumber()>projection.getHall().getNumberOfSeatsPerRow()){
+        if (ticketDTO.getSeatNumber() < 1 || ticketDTO.getSeatNumber() > projection.getHall().getNumberOfSeatsPerRow()){
             throw new BadRequestException("Ticket seat is invalid.");
         }
     }

@@ -22,6 +22,8 @@ import java.sql.SQLException;
 public class UserController {
 
     public static final String LOGGED_USER = "logged_user";
+    public static final int MIN_LENGTH = 2;
+    public static final int MAX_NAME_LENGTH = 15;
 
     @Autowired
     private UserDAO userDao;
@@ -94,7 +96,7 @@ public class UserController {
         if (isUsernameTaken(userDto)){
             throw new BadRequestException("This username is taken.");
         }
-        if(!userDto.getPassword().equals(userDto.getConfirmPassword())){
+        if (!userDto.getPassword().equals(userDto.getConfirmPassword())){
             throw new BadRequestException("Both passwords must be the same.");
         }
         if (!hasValidPassword(userDto.getPassword())){
@@ -103,6 +105,17 @@ public class UserController {
                     "one or more lowercase characters, " +
                     "one or more digits, " +
                     "one or more special characters.");
+        }
+        if (userDto.getFirstName().length() > MAX_NAME_LENGTH || userDto.getFirstName().length() < MIN_LENGTH ||
+            userDto.getSecondName().length() > MAX_NAME_LENGTH || userDto.getSecondName().length() < MIN_LENGTH ||
+            userDto.getLastName().length() > MAX_NAME_LENGTH || userDto.getLastName().length() < MIN_LENGTH ||
+            userDto.getUsername().length() > MAX_NAME_LENGTH || userDto.getUsername().length() < MIN_LENGTH ||
+            userDto.getCity().length() > MAX_NAME_LENGTH || userDto.getCity().length() < MIN_LENGTH ||
+            userDto.getAddress().length() > MAX_NAME_LENGTH *3 || userDto.getAddress().length() < MIN_LENGTH ||
+            userDto.getEducation().length() > MAX_NAME_LENGTH || userDto.getEducation().length() < MIN_LENGTH ||
+            userDto.getJob().length() > MAX_NAME_LENGTH || userDto.getJob().length() < MIN_LENGTH ||
+            userDto.getPersonalInfo().length() > MAX_NAME_LENGTH *6 || userDto.getPersonalInfo().length() < MIN_LENGTH){
+            throw new BadRequestException("Please check your data");
         }
     }
 

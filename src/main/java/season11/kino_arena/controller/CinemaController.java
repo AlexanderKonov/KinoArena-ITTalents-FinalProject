@@ -78,6 +78,12 @@ public class CinemaController {
         if (!isValidAddress(cinema.getAddress())){
             throw new BadRequestException("Address is not valid.");
         }
+        if (cinema.getName().length() < 2 || cinema.getName().length() > 15 ||
+            cinema.getAddress().length() < 2 || cinema.getAddress().length() > 45 ||
+            cinema.getCity().length() < 2 || cinema.getCity().length() > 15 ||
+            cinema.getCinemaInfo().length() < 2 || cinema.getCinemaInfo().length() > 15){
+            throw new BadRequestException("Check your data");
+        }
     }
 
     private boolean isValidCity(String city){

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 @RestController
 public class MovieController {
 
+    public static final int MIN_LENGTH = 2;
+    public static final int MAX_LENGTH = 100;
     @Autowired
     private MovieDAO movieDAO;
     @Autowired
@@ -113,7 +115,7 @@ public class MovieController {
         if (!runtimeIsValid(movie.getRuntimeInMin())){
             throw new BadRequestException("Movie is too short or too long.");
         }
-        if (movie.getRating()<0||movie.getRating()>10){
+        if (movie.getRating() < 0 || movie.getRating() > 10){
             throw new BadRequestException("Rating value is not correct.");
         }
         if (!nameIsValid(movie.getCast())){
@@ -122,10 +124,16 @@ public class MovieController {
         if (!nameIsValid(movie.getDirector())){
             throw new BadRequestException("Director value is not correct.");
         }
+        if (movie.getName().length() < MIN_LENGTH ||
+            movie.getDescription().length() < MIN_LENGTH || movie.getDescription().length() > MAX_LENGTH *2 ||
+            movie.getCast().length() < MIN_LENGTH || movie.getCast().length() > MAX_LENGTH ||
+            movie.getDirector().length() < MIN_LENGTH || movie.getDirector().length() > MAX_LENGTH){
+            throw new BadRequestException("Check your data.");
+        }
     }
 
     private boolean runtimeIsValid(int runtime){
-        return runtime>0 && runtime < 300;
+        return runtime > 0 && runtime < 300;
     }
 
     private boolean nameIsValid(String name){

@@ -14,6 +14,7 @@ import season11.kino_arena.model.pojo.User;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @RestController
@@ -26,11 +27,10 @@ public class ProjectionController {
     @Autowired
     private CinemaHallDAO cinemaHallDAO;
     @Autowired
-    private TicketDAO ticketDAO;
-    @Autowired
     private CinemaDAO cinemaDAO;
     @Autowired
     private VideoFormatDAO videoFormatDAO;
+
     @PostMapping("/projections/add")
     public Projection addProjection(@RequestBody ProjectionDTO reqProjection, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(UserController.LOGGED_USER);
@@ -44,10 +44,10 @@ public class ProjectionController {
         ProjectionTimeAndDurationDTO projectionToBeAdded =
                 new ProjectionTimeAndDurationDTO(reqProjection.getDateTime(),movieDAO.getById(reqProjection.getMovie()).getRuntimeInMin());
         if (thereIsSpace(allProjectionsForTheChosenHall,projectionToBeAdded)){
-        projectionDAO.addProjection(reqProjection);
-        return new Projection(reqProjection,
-                movieDAO.getById(reqProjection.getMovie()),
-                cinemaHallDAO.getById(reqProjection.getHall()));
+            projectionDAO.addProjection(reqProjection);
+            return new Projection(reqProjection,
+                    movieDAO.getById(reqProjection.getMovie()),
+                    cinemaHallDAO.getById(reqProjection.getHall()));
         }
         else {
             throw new BadRequestException("Projection can not be added in this time interval.");
@@ -61,7 +61,7 @@ public class ProjectionController {
         if (cinemaHallDAO.getById(reqProjection.getHall()) == null){
             throw new BadRequestException("Cinema hall doesn't exist.");
         }
-        if (reqProjection.getDateTime()==null){
+        if (reqProjection.getDateTime() == null || reqProjection.getDateTime().isBefore(LocalDateTime.now())){
             throw new BadRequestException("DateTime is incorrect.");
         }
     }
@@ -85,10 +85,10 @@ public class ProjectionController {
         ProjectionTimeAndDurationDTO projectionToBeEdited =
                 new ProjectionTimeAndDurationDTO(reqProjection.getDateTime(),movieDAO.getById(reqProjection.getMovie()).getRuntimeInMin());
         if (thereIsSpace(allProjectionsForTheChosenHall,projectionToBeEdited)){
-        projectionDAO.editProjection(reqProjection);
-        return new Projection(reqProjection,
-                movieDAO.getById(reqProjection.getMovie()),
-                cinemaHallDAO.getById(reqProjection.getHall()));
+            projectionDAO.editProjection(reqProjection);
+            return new Projection(reqProjection,
+                    movieDAO.getById(reqProjection.getMovie()),
+                    cinemaHallDAO.getById(reqProjection.getHall()));
         }
         else {
             throw new BadRequestException("Projection can not be edited to this state, due to the time interval.");
@@ -118,9 +118,9 @@ public class ProjectionController {
 
     @GetMapping("projections/{cinemaId}/{projectionTypeId}")
     public ArrayList<Projection> getAllProjectionsByCinemaAndProjectionType(
-                                                        @PathVariable(name = "cinemaId") long cinemaId,
-                                                        @PathVariable(name = "projectionTypeId") long projectionTypeId)
-                                                                                                    throws SQLException {
+            @PathVariable(name = "cinemaId") long cinemaId,
+            @PathVariable(name = "projectionTypeId") long projectionTypeId)
+            throws SQLException {
         if (cinemaDAO.getCinemaById(cinemaId)==null){
             throw new NotFoundException("Cinema was not found.");
         }
